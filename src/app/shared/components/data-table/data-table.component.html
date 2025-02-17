@@ -1,0 +1,42 @@
+<div>
+  <hlm-table class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+    <hlm-trow>
+      @for (col of columns; track col.key) {
+        <hlm-th
+          class="{{ col.class || '' }}"
+          [style.minWidth]="col.minWidth || '100px'"
+          [style.maxWidth]="col.maxWidth || '300px'"
+          [style.width]="col.width || '25%'"
+        >
+          {{ col.label }}
+        </hlm-th>
+      }
+    </hlm-trow>
+    @for (row of data; track row) {
+      <hlm-trow>
+        @for (col of columns; track col.key) {
+          <hlm-td
+            class="font-medium {{ col.class || '' }}"
+            [style.minWidth]="col.minWidth || '100px'"
+            [style.maxWidth]="col.maxWidth || '300px'"
+            [style.width]="col.width || '25%'"
+          >
+            {{ row[col.key] }}
+          </hlm-td>
+        }
+      </hlm-trow>
+    }
+  </hlm-table>
+
+  <brn-select class="inline-block" placeholder="Select an option">
+    <hlm-select-trigger>
+      <hlm-select-value />
+    </hlm-select-trigger>
+    <hlm-select-content class="w-56">
+      <hlm-option value="Refresh">Refresh</hlm-option>
+      <hlm-option value="Settings">Settings</hlm-option>
+      <hlm-option value="Help">Help</hlm-option>
+      <hlm-option value="Signout">Sign out</hlm-option>
+    </hlm-select-content>
+  </brn-select>
+</div>

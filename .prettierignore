@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+volumes/
+.sst/
+
+*-lock.json
+*-lock.yaml
+*.lock
+
+.env
+.env.*
+.env-*
+
+./src/styles.css

@@ -1,0 +1,38 @@
+{
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "semi": true,
+  "arrowParens": "avoid",
+  "endOfLine": "auto",
+
+  "importOrder": [
+    "^(@angular/(.*)$)|^(@angular$)",
+    "^(angular/(.*)$)|^(angular$)",
+    "",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^types$",
+    "^@env/(.*)$",
+    "^@core/(.*)$",
+    "^@shared/(.*)$",
+    "^@modules/(.*)$",
+    "^@services/(.*)$",
+    "^@models/(.*)$",
+    "^@assets/(.*)$",
+    "^@components/(.*)$",
+    "^@utils/(.*)$",
+    "^@types/(.*)$",
+    "",
+    "^[./]"
+  ],
+  "importOrderSeparation": false,
+  "importOrderSortSpecifiers": true,
+  "importOrderBuiltinModulesToTop": true,
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "importOrderMergeDuplicateImports": true,
+  "importOrderCombineTypeAndValueImports": true,
+  "plugins": ["@ianvs/prettier-plugin-sort-imports"]
+}

@@ -1,0 +1,33 @@
+<div>
+  <app-button impact="bold" tone="primary" shape="rounded" size="medium">
+    Página principal
+  </app-button>
+  <app-data-table
+    [columns]="[
+      { key: 'invoice', label: 'Invoice' },
+      { key: 'paymentStatus', label: 'Status' },
+      { key: 'paymentMethod', label: 'Method' },
+      { key: 'totalAmount', label: 'Amount' },
+    ]"
+    [data]="[
+      {
+        invoice: 'INV001',
+        paymentStatus: 'Paid',
+        paymentMethod: 'Credit Card',
+        totalAmount: '$250.00',
+      },
+      {
+        invoice: 'INV002',
+        paymentStatus: 'Pending',
+        paymentMethod: 'PayPal',
+        totalAmount: '$150.00',
+      },
+      {
+        invoice: 'INV003',
+        paymentStatus: 'Unpaid',
+        paymentMethod: 'Bank Transfer',
+        totalAmount: '$350.00',
+      },
+    ]"
+  />
+</div>
