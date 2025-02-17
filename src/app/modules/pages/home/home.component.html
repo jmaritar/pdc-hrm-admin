@@ -1,1 +1,54 @@
-<p>home works!</p>
+<div class="p-6 space-y-6">
+  <h1 class="text-3xl font-bold">Bienvenido, {{ user.name }} 👋</h1>
+  <p class="text-gray-600">Gestiona fácilmente a tus empleados y empresas</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Estadísticas principales -->
+    <div class="p-6 border-muted/20 bg-background border rounded-xl">
+      <p class="text-lg font-semibold">Total Empleados</p>
+      <p class="text-2xl font-bold text-blue-600">{{ stats.totalEmployees }}</p>
+    </div>
+    <div class="p-6 border-muted/20 bg-background border rounded-xl">
+      <p class="text-lg font-semibold">Total Empresas</p>
+      <p class="text-2xl font-bold text-green-600">{{ stats.totalCompanies }}</p>
+    </div>
+    <div class="p-6 border-muted/20 bg-background border rounded-xl">
+      <p class="text-lg font-semibold">Colaboradores Activos</p>
+      <p class="text-2xl font-bold text-purple-600">{{ stats.activeEmployees }}</p>
+    </div>
+  </div>
+
+  <!-- Accesos rápidos -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <button
+      (click)="onClickEmployee()"
+      class="p-4 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600"
+    >
+      📋 Gestionar Colaboradores
+    </button>
+    <button
+      (click)="onClickCompany()"
+      class="p-4 bg-green-500 text-white rounded-xl shadow hover:bg-green-600"
+    >
+      🏢 Gestionar Empresas
+    </button>
+    <button
+      (click)="onClickGeographic()"
+      class="p-4 bg-yellow-500 text-white rounded-xl shadow hover:bg-yellow-600"
+    >
+      🌍 Gestión Geográfica
+    </button>
+  </div>
+
+  <!-- Últimos cambios -->
+  <div class="rder-muted/20 bg-background border p-6 rounded-xl">
+    <h2 class="text-xl font-semibold mb-4">Últimos cambios</h2>
+    <ul class="space-y-2 text-gray-600">
+      @for (log of logs; track $index) {
+        <li :key="$index">
+          📌 {{ log.message }} - <span class="text-sm text-gray-400">{{ log.date }}</span>
+        </li>
+      }
+    </ul>
+  </div>
+</div>

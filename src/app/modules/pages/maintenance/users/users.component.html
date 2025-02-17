@@ -1,33 +1,115 @@
-<div>
-  <app-button impact="bold" tone="primary" shape="rounded" size="medium">
-    Página principal
-  </app-button>
-  <app-data-table
-    [columns]="[
-      { key: 'invoice', label: 'Invoice' },
-      { key: 'paymentStatus', label: 'Status' },
-      { key: 'paymentMethod', label: 'Method' },
-      { key: 'totalAmount', label: 'Amount' },
-    ]"
-    [data]="[
-      {
-        invoice: 'INV001',
-        paymentStatus: 'Paid',
-        paymentMethod: 'Credit Card',
-        totalAmount: '$250.00',
-      },
-      {
-        invoice: 'INV002',
-        paymentStatus: 'Pending',
-        paymentMethod: 'PayPal',
-        totalAmount: '$150.00',
-      },
-      {
-        invoice: 'INV003',
-        paymentStatus: 'Unpaid',
-        paymentMethod: 'Bank Transfer',
-        totalAmount: '$350.00',
-      },
-    ]"
-  />
+<div class="p-6 border-muted/20 bg-background border rounded-xl over">
+  <button hlmBtn (click)="onCreateUser()">Agregar Usuario</button>
+
+  <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table>
+
+  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
+    <hlm-dialog-content *brnDialogContent="let ctx">
+      <hlm-dialog-header class="max-w-xl md:min-w-md">
+        <h3 hlmDialogTitle>{{ selectedUser ? 'Actualizar Usuario' : 'Crear Usuario' }}</h3>
+        <p hlmDialogDescription>
+          {{
+            selectedUser
+              ? 'Actualice los detalles del usuario.'
+              : 'Complete los detalles para crear un nuevo usuario.'
+          }}
+        </p>
+      </hlm-dialog-header>
+
+      <form [formGroup]="form" class="space-y-6">
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Nombre del usuario
+            <input
+              aria-label="Nombre"
+              formControlName="name"
+              autocomplete="off"
+              class="mt-1.5 w-full"
+              hlmInput
+              type="text"
+              placeholder="Nombre"
+            />
+          </label>
+
+          <hlm-error>El nombre es requerido</hlm-error>
+        </hlm-form-field>
+
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Correo electrónico
+
+            <input
+              aria-label="Correo"
+              formControlName="email"
+              class="mt-1.5 w-full"
+              hlmInput
+              autocomplete="off"
+              type="email"
+              placeholder="Correo electrónico"
+              [disabled]="selectedUser !== null"
+            />
+          </label>
+          <hlm-error>El correo es requerido {{ selectedUser }}</hlm-error>
+        </hlm-form-field>
+
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Contraseña
+            <input
+              aria-label="Contraseña"
+              formControlName="password"
+              class="w-full"
+              hlmInput
+              autocomplete="off"
+              type="password"
+              placeholder="Contraseña"
+            />
+          </label>
+          <hlm-error>La contraseña es requerida</hlm-error>
+        </hlm-form-field>
+
+        <hlm-form-field class="flex w-full flex-col">
+          <label class="block" hlmLabel for="role-select">Rol </label>
+          <brn-select id="role-select" class="inline-block" formControlName="role">
+            <hlm-select-trigger class="w-full">
+              <!-- <hlm-select-value> -->
+              {{ selectedRoleLabel }}
+
+              <!-- </hlm-select-value> -->
+            </hlm-select-trigger>
+            <hlm-select-content>
+              <hlm-select-label>Selecciona un rol</hlm-select-label>
+              @for (role of roles; track role.value) {
+                <hlm-option [value]="role.value">{{ role.label }}</hlm-option>
+              }
+            </hlm-select-content>
+          </brn-select>
+          <hlm-error>El rol es requerido</hlm-error>
+        </hlm-form-field>
+      </form>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
+        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
+          {{ selectedUser ? 'Actualizar' : 'Crear' }}
+        </button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+
+  <hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="onModalClose()">
+    <hlm-dialog-content *brnDialogContent="let ctx">
+      <hlm-dialog-header class="max-w-md">
+        <h3 hlmDialogTitle>Confirmar Desactivación</h3>
+        <p hlmDialogDescription>
+          ¿Estás seguro de que deseas desactivar a {{ selectedUser?.name }}?
+        </p>
+      </hlm-dialog-header>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="default" (click)="onModalClose()">Cancelar</button>
+        <button hlmBtn variant="destructive" (click)="onConfirmDeactivation()">Desactivar</button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
 </div>

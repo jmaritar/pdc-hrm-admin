@@ -1,7 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
-import { BrnSelectImports } from '@spartan-ng/brain/select';
-import { HlmSelectImports } from '@spartan-ng/ui-select-helm';
 import {
   HlmTableComponent,
   HlmTdComponent,
@@ -12,24 +11,15 @@ import {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [
-    HlmTableComponent,
-    HlmTrowComponent,
-    HlmThComponent,
-    HlmTdComponent,
-    BrnSelectImports,
-    HlmSelectImports,
-  ],
+  imports: [CommonModule, HlmTableComponent, HlmTrowComponent, HlmThComponent, HlmTdComponent],
   templateUrl: './data-table.component.html',
 })
 export class DataTableComponent {
-  @Input() columns: {
-    key: string;
-    label: string;
-    width?: string;
-    minWidth?: string;
-    maxWidth?: string;
-    class?: string;
-  }[] = [];
+  @Input() columns: { key: string; label: string; width?: string }[] = [];
   @Input() data: Record<string, unknown>[] = [];
+  @Input() actions: { label: string; callback: (row: any) => void }[] = [];
+
+  handleAction(action: { label: string; callback: (row: any) => void }, row: any) {
+    action.callback(row);
+  }
 }

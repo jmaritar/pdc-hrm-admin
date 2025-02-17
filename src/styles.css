@@ -364,3 +364,52 @@ select {
 .is__invalid-error {
   @apply px-1 pt-1 text-xs text-destructive;
 }
+
+/* Estilos responsivos para pantallas pequeñas */
+@media (max-width: 768px) {
+  hlm-table {
+    display: block;
+    width: 100%;
+  }
+
+  /* Hacer que las celdas de la tabla se apilen verticalmente en pantallas pequeñas */
+  hlm-trow {
+    display: block;
+    width: 100%;
+  }
+
+  hlm-td,
+  hlm-th {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+  }
+
+  .space-x-2 {
+    margin-bottom: 10px;
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Para pantallas extra pequeñas (teléfonos móviles), ajustar aún más */
+  .px-4 {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .py-3 {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
