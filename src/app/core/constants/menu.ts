@@ -19,6 +19,11 @@ export class Menu {
       items: [
         {
           icon: 'assets/icons/heroicons/outline/users.svg',
+          label: 'Usuarios',
+          route: '/maintenance/users',
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/users-group.svg',
           label: 'Colaboradores',
           route: '/maintenance/collaborators',
         },

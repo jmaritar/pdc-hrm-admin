@@ -1,9 +1,18 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
+import { NgxSonnerToaster } from 'ngx-sonner';
+
+import { ThemeService } from './core/services/theme.service';
+import { ResponsiveHelperComponent } from './shared/components/responsive-helper/responsive-helper.component';
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: ` <router-outlet /> `,
+  templateUrl: './app.component.html',
+  imports: [RouterOutlet, ResponsiveHelperComponent, NgxSonnerToaster],
 })
-export class AppComponent {}
+export class AppComponent {
+  title = 'HRM Admin - Grupo PDC';
+
+  constructor(public themeService: ThemeService) {}
+}

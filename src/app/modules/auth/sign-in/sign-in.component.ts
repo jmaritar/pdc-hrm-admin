@@ -1,5 +1,5 @@
 import { NgClass, NgIf } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -10,8 +10,11 @@ import {
 import { Router } from '@angular/router';
 
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { toast } from 'ngx-sonner';
 
 import { ButtonComponent } from '@shared/components/button/button.component';
+
+import { AuthService } from '../data-access/auth.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -22,6 +25,8 @@ export class SignInComponent implements OnInit {
   form!: FormGroup;
   submitted = false;
   passwordTextType!: boolean;
+
+  private _authService = inject(AuthService);
 
   constructor(
     private readonly _formBuilder: FormBuilder,
@@ -49,14 +54,32 @@ export class SignInComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { email, password } = this.form.value;
 
-    // stop here if form is invalid
-    if (this.form.invalid) {
-      return;
-    }
+    this._authService.signIn(email, password).subscribe({
+      next: (response: any) => {
+        console.log(response);
 
-    this._router.navigate(['/']);
+        // Suponiendo que el código de estado está en `response.statusCode` y el mensaje en `response.message`
+        if (response.statusCode === 200) {
+          // Mostrar mensaje de éxito si el código es 200 (éxito)
+          toast.success(response.message);
+
+          this._router.navigate(['/home']);
+        } else if (response.statusCode === 401) {
+          // Mostrar mensaje de error para código 401 (por ejemplo, credenciales inválidas)
+          toast.error(response.message);
+        } else {
+          // Manejar otros códigos de estado
+          toast.error('An unexpected error occurred. Please try again.');
+        }
+      },
+      error: error => {
+        console.error(error);
+        toast.error('Something went wrong. Please try again.', {
+          description: error.message,
+        });
+      },
+    });
   }
 }

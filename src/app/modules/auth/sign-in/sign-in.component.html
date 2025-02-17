@@ -27,7 +27,7 @@
           type="text"
           id="email"
           [ngClass]="{ 'is__invalid-input': submitted && f['email'].errors }"
-          class="peer block"
+          class="peer block !bg-white"
           placeholder=" "
           formControlName="email"
         />
@@ -51,7 +51,7 @@
           [type]="passwordTextType ? 'text' : 'password'"
           id="password"
           [ngClass]="{ 'is__invalid-input': submitted && f['password'].errors }"
-          class="peer block"
+          class="peer block !bg-white"
           placeholder=" "
           formControlName="password"
         />
@@ -65,6 +65,8 @@
         <span
           class="text-muted-foreground absolute top-2.5 right-5 cursor-pointer"
           (click)="togglePasswordTextType()"
+          (keydown.enter)="togglePasswordTextType()"
+          tabindex="0"
         >
           <svg-icon
             [src]="

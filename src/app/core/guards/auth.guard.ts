@@ -1,24 +1,39 @@
 import { inject } from '@angular/core';
-import { CanMatchFn, GuardResult, MaybeAsync, Router } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 
-import { map } from 'rxjs';
+import { AuthStateService } from '@app/shared/data-access/auth-state.service';
 
-import { AuthService } from '@modules/auth/data-access/auth.service';
+export const privateGuard = (): CanActivateFn => {
+  return () => {
+    const authState = inject(AuthStateService);
+    const router = inject(Router);
 
-// export const authGuard: CanMatchFn = (route, segments): MaybeAsync<GuardResult> => {
-//   const router = inject(Router);
+    const session = authState.getSession();
 
-//   return inject(AuthService).currentUser$.pipe(
-//     map(user => {
-//       if (user) {
-//         return true;
-//       }
+    if (session) {
+      return true;
+    }
 
-//       return router.createUrlTree(['/auth/sign-in']);
-//     })
-//   );
-// };
+    router.navigateByUrl('/auth/sign-in');
 
-export const authGuard: CanMatchFn = (route, segments): MaybeAsync<GuardResult> => {
-  return true;
+    return false;
+  };
+};
+
+export const publicGuard = (): CanActivateFn => {
+  return () => {
+    const authState = inject(AuthStateService);
+    const router = inject(Router);
+
+    const session = authState.getSession();
+
+    console.log(session);
+
+    if (session) {
+      router.navigateByUrl('/home');
+      return false;
+    }
+
+    return true;
+  };
 };

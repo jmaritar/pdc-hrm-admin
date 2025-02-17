@@ -1,8 +1,9 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { NgClass } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
+import { AuthStateService } from '@app/shared/data-access/auth-state.service';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
 import { ThemeService } from '@core/services/theme.service';
@@ -11,7 +12,6 @@ import { ClickOutsideDirective } from '@shared/directives/click-outside.directiv
 @Component({
   selector: 'app-profile-menu',
   templateUrl: './profile-menu.component.html',
-  styleUrls: ['./profile-menu.component.css'],
   imports: [ClickOutsideDirective, NgClass, RouterLink, AngularSvgIconModule],
   animations: [
     trigger('openClose', [
@@ -40,7 +40,7 @@ export class ProfileMenuComponent implements OnInit {
   public isOpen = false;
   public profileMenu = [
     {
-      title: 'Your Profile',
+      title: 'Profile',
       icon: './assets/icons/heroicons/outline/user-circle.svg',
       link: '/profile',
     },
@@ -48,11 +48,6 @@ export class ProfileMenuComponent implements OnInit {
       title: 'Settings',
       icon: './assets/icons/heroicons/outline/cog-6-tooth.svg',
       link: '/settings',
-    },
-    {
-      title: 'Log out',
-      icon: './assets/icons/heroicons/outline/logout.svg',
-      link: '/auth',
     },
   ];
 
@@ -89,7 +84,12 @@ export class ProfileMenuComponent implements OnInit {
 
   public themeMode = ['light', 'dark'];
 
-  constructor(public themeService: ThemeService) {}
+  private _authStateService = inject(AuthStateService);
+
+  constructor(
+    public themeService: ThemeService,
+    private readonly _router: Router
+  ) {}
 
   ngOnInit(): void {
     console.log(this.themeService.theme);
@@ -104,6 +104,11 @@ export class ProfileMenuComponent implements OnInit {
       const mode = !this.themeService.isDark ? 'dark' : 'light';
       return { ...theme, mode: mode };
     });
+  }
+
+  onSignOut() {
+    this._authStateService.signOut();
+    this._router.navigateByUrl('/auth/sign-in');
   }
 
   toggleThemeColor(color: string) {

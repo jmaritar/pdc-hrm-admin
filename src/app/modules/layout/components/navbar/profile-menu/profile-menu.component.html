@@ -10,10 +10,16 @@
       alt=""
     />
   </button>
+
   <!-- Dropdown -->
+  <!-- class="bg-background shadow-custom absolute right-0 z-20 mt-2 w-60 origin-top-right transform rounded-md py-4 ring-1 ring-transparent ring-opacity-5 transition focus:outline-hidden" -->
   <div
     [@openClose]="isOpen ? 'open' : 'closed'"
-    class="bg-background shadow-custom absolute right-0 z-20 mt-2 w-60 origin-top-right transform rounded-md py-4 ring-1 ring-transparent ring-opacity-5 transition focus:outline-hidden"
+    [class]="
+      isOpen
+        ? 'bg-background shadow-custom absolute right-0 z-20 mt-2 w-60 origin-top-right transform rounded-md py-4 ring-1 ring-transparent ring-opacity-5 transition focus:outline-hidden'
+        : 'bg-background shadow-custom absolute right-0 z-20 mt-2 w-60 origin-top-right transform rounded-md py-4 ring-1 ring-transparent ring-opacity-5 transition focus:outline-hidden hidden'
+    "
   >
     <div class="flext-row flex items-center px-4 pb-4">
       <div class="w-10 shrink-0">
@@ -41,6 +47,21 @@
           {{ item.title }}
         </li>
       }
+
+      <li
+        :key="profileMenu.length"
+        (click)="onSignOut()"
+        (keydown.enter)="onSignOut()"
+        tabindex="0"
+        class="text-muted-foreground hover:bg-card hover:text-primary inline-flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold"
+      >
+        <svg-icon
+          src="./assets/icons/heroicons/outline/logout.svg"
+          [svgClass]="'h-5 w-5 text-muted-foreground/50'"
+        >
+        </svg-icon>
+        Log out
+      </li>
     </ul>
     <hr class="border-border border-dashed" />
     <div class="mx-4 my-2">
@@ -49,9 +70,11 @@
         @for (item of themeColors; track $index) {
           <div
             :key="$index"
+            tabindex="0"
             (click)="toggleThemeColor(item.name)"
+            (keydown.enter)="toggleThemeColor(item.name)"
             [ngClass]="{
-              'border-muted-foreground bg-card': item.name == themeService.theme().color,
+              'border-muted-foreground bg-card': item.name === themeService.theme().color,
             }"
             class="focus-visible:ring-ring border-border bg-background text-muted-foreground hover:bg-card hover:text-foreground shadow-xs inline-flex h-8 cursor-pointer items-center justify-start whitespace-nowrap rounded-md border px-3 text-xs font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
           >
@@ -71,7 +94,9 @@
           <div
             :key="$index"
             (click)="toggleThemeMode()"
-            [ngClass]="{ 'border-muted-foreground bg-card': item == themeService.theme().mode }"
+            tabindex="0"
+            (keydown.enter)="toggleThemeMode()"
+            [ngClass]="{ 'border-muted-foreground bg-card': item === themeService.theme().mode }"
             class="focus-visible:ring-ring border-border bg-background text-muted-foreground hover:bg-card hover:text-foreground shadow-xs inline-flex h-8 cursor-pointer items-center justify-start whitespace-nowrap rounded-md border px-3 text-xs font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
           >
             <svg-icon

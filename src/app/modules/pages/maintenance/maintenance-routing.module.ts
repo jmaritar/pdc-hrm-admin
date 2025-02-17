@@ -1,23 +1,29 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { hasRoleGuard } from '@app/core/guards/has-role.guard';
+
 const routes: Routes = [
   {
     path: 'users',
+    canActivate: [hasRoleGuard(['SUPER_ADMIN'])],
     loadComponent: () => import('./users/users.component').then(m => m.UsersComponent),
   },
   {
     path: 'collaborators',
+    canActivate: [hasRoleGuard(['SUPER_ADMIN'])],
     loadComponent: () =>
       import('./collaborators/collaborators.component').then(m => m.CollaboratorsComponent),
   },
   {
     path: 'companies/businesses',
+    canActivate: [hasRoleGuard(['SUPER_ADMIN', 'ADMIN'])],
     loadComponent: () =>
       import('./companies/businesses/businesses.component').then(m => m.BusinessesComponent),
   },
   {
     path: 'companies/business-types',
+    canActivate: [hasRoleGuard(['SUPER_ADMIN', 'ADMIN'])],
     loadComponent: () =>
       import('./companies/business-types/business-types.component').then(
         m => m.BusinessTypesComponent
@@ -25,16 +31,19 @@ const routes: Routes = [
   },
   {
     path: 'geography/countries',
+    canActivate: [hasRoleGuard(['SUPER_ADMIN', 'ADMIN'])],
     loadComponent: () =>
       import('./geography/countries/countries.component').then(m => m.CountriesComponent),
   },
   {
     path: 'geography/departments',
+    canActivate: [hasRoleGuard(['SUPER_ADMIN', 'ADMIN'])],
     loadComponent: () =>
       import('./geography/departments/departments.component').then(m => m.DepartmentsComponent),
   },
   {
     path: 'geography/municipalities',
+    canActivate: [hasRoleGuard(['SUPER_ADMIN', 'ADMIN'])],
     loadComponent: () =>
       import('./geography/municipalities/municipalities.component').then(
         m => m.MunicipalitiesComponent

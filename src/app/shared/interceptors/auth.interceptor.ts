@@ -5,9 +5,11 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthStateService } from '../data-access/auth-state.service';
-import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+
+import { catchError, throwError } from 'rxjs';
+
+import { AuthStateService } from '../data-access/auth-state.service';
 
 export const authInterceptor: HttpInterceptorFn = (
   request: HttpRequest<unknown>,
@@ -26,10 +28,10 @@ export const authInterceptor: HttpInterceptorFn = (
   });
 
   return next(request).pipe(
-    catchError((error) => {
+    catchError(error => {
       if (error instanceof HttpErrorResponse && error.status === 401) {
         authState.signOut();
-        router.navigateByUrl('/auth/log-in');
+        router.navigateByUrl('/auth/sign-in');
       }
 
       return throwError(() => error);
