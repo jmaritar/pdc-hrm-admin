@@ -1,51 +1,44 @@
-<div class="overflow-auto">
-  <hlm-table class="min-w-fullr">
-    <!-- Encabezados -->
-    <hlm-trow class="bg-transparent">
-      @for (col of columns; track col.key) {
-        <hlm-th
-          class="px-4 py-3 text-left font-semibold text-gray-700"
-          [style.width]="col.width || 'auto'"
-        >
-          {{ col.label }}
-        </hlm-th>
-      }
-      <hlm-th *ngIf="actions.length > 0" class="px-4 py-3 text-center w-[150px]">Acciones</hlm-th>
-    </hlm-trow>
-
-    <!-- Filas -->
-    @for (row of data; track row) {
-      <hlm-trow class="border-b border-gray-300">
-        @for (col of columns; track col.key) {
-          <hlm-td class="px-4 py-3 text-gray-900" [style.width]="col.width || 'auto'">
-            {{ row[col.key] }}
-          </hlm-td>
-        }
-
-        <!-- Botones de acciones -->
-        <hlm-td *ngIf="actions.length > 0" class="px-4 py-3 text-center w-[150px]">
-          <div class="flex justify-center space-x-2">
-            @for (action of actions; track action.label) {
-              <button
-                hlmBtn
-                class="px-3 py-1 text-sm font-medium text-white rounded-lg transition-all"
-                [class.bg-blue-500]="action.label === 'Editar'"
-                [class.bg-red-500]="action.label === 'Desactivar' && !row['is_active']"
-                [class.bg-green-500]="action.label === 'Desactivar' && row['is_active']"
-                (click)="handleAction(action, row)"
-              >
-                {{
-                  action.label === 'Desactivar'
-                    ? row['is_active']
-                      ? 'Activar'
-                      : 'Desactivar'
-                    : action.label
-                }}
-              </button>
+<div class="space-y-4">
+  <app-data-table-toolbar [table]="table" />
+  <div class="rounded-md border">
+    <table>
+      <thead>
+        @for (headerGroup of table.getHeaderGroups(); track headerGroup.id) {
+          <tr>
+            @for (header of headerGroup.headers; track header.id) {
+              @if (!header.isPlaceholder) {
+                <th>
+                  <ng-container
+                    *flexRender="
+                      header.column.columnDef.header;
+                      props: header.getContext();
+                      let header
+                    "
+                  >
+                    <div [innerHTML]="header"></div>
+                  </ng-container>
+                </th>
+              }
             }
-          </div>
-        </hlm-td>
-      </hlm-trow>
-    }
-  </hlm-table>
+          </tr>
+        }
+      </thead>
+
+      <tbody>
+        @for (row of table.getRowModel().rows; track row.id) {
+          <tr>
+            @for (cell of row.getVisibleCells(); track cell.id) {
+              <td>
+                <ng-container
+                  *flexRender="cell.column.columnDef.cell; props: cell.getContext(); let cell"
+                >
+                  <div [innerHTML]="cell"></div>
+                </ng-container>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </div>

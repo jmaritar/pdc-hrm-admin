@@ -62,6 +62,11 @@ export class Menu {
           label: 'Reportes',
           route: '/management/reports',
         },
+        {
+          icon: 'assets/icons/heroicons/outline/chart-bar.svg',
+          label: 'Data Table',
+          route: '/management/data-table-use',
+        },
       ],
     },
     {

@@ -1,0 +1,12 @@
+<div className="flex items-center justify-between">
+  <div className="flex flex-1 items-center space-x-2">
+    <input
+      hlmInput
+      class="w-80"
+      type="search"
+      placeholder="Search ..."
+      [value]="table.getColumn('firstName')?.getFilterValue() || ''"
+      (input)="updateFilter($event)"
+    />
+  </div>
+</div>

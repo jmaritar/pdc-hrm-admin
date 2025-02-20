@@ -1,7 +1,9 @@
 import { NgClass, NgIf } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+
 import { AngularSvgIconModule } from 'angular-svg-icon';
-import packageJson from '../../../../../../package.json';
+import packageJson from 'package.json';
+
 import { MenuService } from '../../services/menu.service';
 import { SidebarMenuComponent } from './sidebar-menu/sidebar-menu.component';
 
@@ -11,12 +13,10 @@ import { SidebarMenuComponent } from './sidebar-menu/sidebar-menu.component';
   styleUrls: ['./sidebar.component.css'],
   imports: [NgClass, NgIf, AngularSvgIconModule, SidebarMenuComponent],
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent {
   public appJson: any = packageJson;
 
   constructor(public menuService: MenuService) {}
-
-  ngOnInit(): void {}
 
   public toggleSidebar() {
     this.menuService.toggleSidebar();

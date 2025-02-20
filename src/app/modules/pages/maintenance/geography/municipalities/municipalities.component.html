@@ -1,1 +1,63 @@
-<p>municipalities works!</p>
+<div class="p-6 border-muted/20 bg-background border rounded-xl">
+  <button hlmBtn (click)="onCreateMunicipality()">Agregar Municipalidad</button>
+
+  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
+
+  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
+    <hlm-dialog-content *brnDialogContent="let ctx">
+      <hlm-dialog-header class="max-w-xl md:min-w-md">
+        <h3 hlmDialogTitle>
+          {{ selectedMunicipality ? 'Actualizar Municipalidad' : 'Crear Municipalidad' }}
+        </h3>
+        <p hlmDialogDescription>
+          {{
+            selectedMunicipality
+              ? 'Actualice los detalles de la municipalidad.'
+              : 'Complete los detalles para crear una nueva municipalidad.'
+          }}
+        </p>
+      </hlm-dialog-header>
+
+      <form [formGroup]="form" class="space-y-6">
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Nombre de la municipalidad
+            <input
+              aria-label="Nombre"
+              formControlName="name"
+              autocomplete="off"
+              class="mt-1.5 w-full"
+              hlmInput
+              type="text"
+              placeholder="Nombre"
+            />
+          </label>
+          <hlm-error>El nombre es requerido</hlm-error>
+        </hlm-form-field>
+
+        <hlm-form-field class="flex w-full flex-col">
+          <label class="block" hlmLabel for="department-select">Departamento</label>
+          <brn-select id="department-select" class="inline-block" formControlName="department_id">
+            <hlm-select-trigger class="w-full">
+              {{ selectedDepartmentLabel }}
+            </hlm-select-trigger>
+            <hlm-select-content>
+              <hlm-select-label>Selecciona un departamento</hlm-select-label>
+              @for (department of departments; track department.id) {
+                <hlm-option [value]="department.id">{{ department.name }}</hlm-option>
+              }
+            </hlm-select-content>
+          </brn-select>
+          <hlm-error>El departamento es requerido</hlm-error>
+        </hlm-form-field>
+      </form>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
+        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
+          {{ selectedMunicipality ? 'Actualizar' : 'Crear' }}
+        </button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+</div>

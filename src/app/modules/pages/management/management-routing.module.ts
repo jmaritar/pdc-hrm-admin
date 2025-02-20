@@ -11,6 +11,11 @@ const routes: Routes = [
     path: 'reports',
     loadComponent: () => import('./reports/reports.component').then(m => m.ReportsComponent),
   },
+  {
+    path: 'data-table-use',
+    loadComponent: () =>
+      import('./data-table-use/data-table-use.component').then(m => m.DataTableUseComponent),
+  },
 ];
 
 @NgModule({

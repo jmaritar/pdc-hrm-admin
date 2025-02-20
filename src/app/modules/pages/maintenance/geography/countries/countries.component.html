@@ -1,1 +1,87 @@
-<p>countries works!</p>
+<div class="p-6 border-muted/20 bg-background border rounded-xl">
+  <button hlmBtn (click)="onCreateCountry()">Agregar País</button>
+
+  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
+
+  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
+    <hlm-dialog-content *brnDialogContent="let ctx">
+      <hlm-dialog-header class="max-w-xl md:min-w-md">
+        <h3 hlmDialogTitle>{{ selectedCountry ? 'Actualizar País' : 'Crear País' }}</h3>
+        <p hlmDialogDescription>
+          {{
+            selectedCountry
+              ? 'Actualice los detalles del país.'
+              : 'Complete los detalles para crear un nuevo país.'
+          }}
+        </p>
+      </hlm-dialog-header>
+
+      <form [formGroup]="form" class="space-y-6">
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Nombre del país
+            <input
+              aria-label="Nombre"
+              formControlName="name"
+              autocomplete="off"
+              class="mt-1.5 w-full"
+              hlmInput
+              type="text"
+              placeholder="Nombre"
+            />
+          </label>
+          <hlm-error>El nombre es requerido</hlm-error>
+        </hlm-form-field>
+
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Código del país
+            <input
+              aria-label="Código"
+              formControlName="code"
+              class="mt-1.5 w-full"
+              hlmInput
+              autocomplete="off"
+              type="text"
+              placeholder="Código"
+              maxlength="3"
+            />
+          </label>
+          <hlm-error>El código es requerido y debe tener máximo 3 caracteres</hlm-error>
+        </hlm-form-field>
+      </form>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
+        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
+          {{ selectedCountry ? 'Actualizar' : 'Crear' }}
+        </button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+
+  <hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="onModalClose()">
+    <hlm-dialog-content *brnDialogContent="let ctx">
+      <hlm-dialog-header class="max-w-md">
+        <h3 hlmDialogTitle>
+          {{ selectedCountry?.is_active ? 'Confirmar Desactivación' : 'Confirmar Activación' }}
+        </h3>
+        <p hlmDialogDescription>
+          ¿Estás seguro de que deseas
+          {{ selectedCountry?.is_active ? 'desactivar' : 'activar' }} a {{ selectedCountry?.name }}?
+        </p>
+      </hlm-dialog-header>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="default" (click)="onModalClose()">Cancelar</button>
+        <button
+          hlmBtn
+          [variant]="selectedCountry?.is_active ? 'destructive' : 'secondary'"
+          (click)="onConfirmDeactivation()"
+        >
+          {{ selectedCountry?.is_active ? 'Desactivar' : 'Activar' }}
+        </button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+</div>

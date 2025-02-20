@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
+// import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
 import { BrnDialogContentDirective } from '@spartan-ng/brain/dialog';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@spartan-ng/brain/forms';
 import { BrnSelectImports } from '@spartan-ng/brain/select';
@@ -25,7 +25,7 @@ import { UserService } from './user.service';
   standalone: true,
   selector: 'app-users',
   imports: [
-    DataTableComponent,
+    // DataTableComponent,
     ReactiveFormsModule,
     BrnDialogContentDirective,
     HlmDialogComponent,
@@ -105,6 +105,7 @@ export class UsersComponent implements OnInit {
 
   onDeactivateUser(user: any) {
     this.selectedUser = user;
+
     this.isConfirmationOpen = true;
   }
 

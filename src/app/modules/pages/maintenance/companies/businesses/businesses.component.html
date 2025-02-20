@@ -1,1 +1,96 @@
-<p>businesses works!</p>
+<div class="p-6 border-muted/20 bg-background border rounded-xl over">
+  <button hlmBtn (click)="onCreateCompany()">Agregar Compañía</button>
+
+  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
+
+  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
+    <hlm-dialog-content *brnDialogContent="let ctx">
+      <hlm-dialog-header class="max-w-xl md:min-w-md">
+        <h3 hlmDialogTitle>{{ selectedCompany ? 'Actualizar Compañía' : 'Crear Compañía' }}</h3>
+        <p hlmDialogDescription>
+          {{
+            selectedCompany
+              ? 'Actualiza los datos de la compañía'
+              : 'Ingresa los datos de la nueva compañía'
+          }}
+        </p>
+      </hlm-dialog-header>
+
+      <form [formGroup]="form" class="space-y-6">
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Nombre de la Compañía
+            <input
+              aria-label="Nombre"
+              formControlName="name"
+              autocomplete="off"
+              class="mt-1.5 w-full"
+              hlmInput
+              type="text"
+              placeholder="Nombre"
+            />
+          </label>
+
+          <hlm-error>El nombre es requerido</hlm-error>
+        </hlm-form-field>
+
+        <hlm-form-field>
+          <label class="block" hlmLabel for="companyType"> Tipo de Empresa </label>
+          <brn-select formControlName="type" id="companyType">
+            <hlm-select-trigger class="w-full">
+              {{ companyTypeLabel }}
+            </hlm-select-trigger>
+            <hlm-select-content>
+              <hlm-select-label>Selecciona un tipo de empresa</hlm-select-label>
+              <hlm-option *ngFor="let type of companyTypes" [value]="type.value">
+                {{ type.label }}
+              </hlm-option>
+            </hlm-select-content>
+          </brn-select>
+
+          <hlm-error>El tipo de empresa es requerido</hlm-error>
+        </hlm-form-field>
+
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Descripción
+            <input
+              aria-label="Descripción"
+              formControlName="description"
+              autocomplete="off"
+              class="mt-1.5 w-full"
+              hlmInput
+              type="text"
+              placeholder="Descripción"
+            />
+          </label>
+
+          <hlm-error>La descripción es requerida</hlm-error>
+        </hlm-form-field>
+      </form>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
+        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
+          {{ selectedCompany ? 'Actualizar' : 'Crear' }}
+        </button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+
+  <hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="onModalClose()">
+    <hlm-dialog-content *brnDialogContent="let ctx">
+      <hlm-dialog-header class="max-w-md">
+        <h3 hlmDialogTitle>Confirmar Eliminación</h3>
+        <p hlmDialogDescription>
+          ¿Estás seguro de que deseas eliminar la compañía {{ selectedCompany?.name }}?
+        </p>
+      </hlm-dialog-header>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="default" (click)="onModalClose()">Cancelar</button>
+        <button hlmBtn variant="destructive" (click)="onConfirmDeletion()">Eliminar</button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+</div>

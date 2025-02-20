@@ -1,0 +1,42 @@
+<div class="flex items-center space-x-2">
+  <div *ngIf="!column.getCanSort(); else sortable" class="flex items-center space-x-2">
+    {{ columnTitle }}
+  </div>
+
+  <ng-template #sortable>
+    <div class="flex items-center space-x-2">
+      <button hlmBtn variant="ghost" size="sm" class="-ml-3 h-8" [brnMenuTriggerFor]="menu">
+        <span>{{ columnTitle }}</span>
+        <ng-icon
+          hlm
+          class="size-2"
+          [name]="
+            column.getIsSorted() === 'desc'
+              ? 'lucideArrowDown'
+              : column.getIsSorted() === 'asc'
+                ? 'lucideArrowUp'
+                : 'lucideChevronsUpDown'
+          "
+        />
+      </button>
+    </div>
+
+    <ng-template #menu>
+      <hlm-menu class="w-40">
+        <button hlmMenuItem (click)="column.toggleSorting(false)">
+          <ng-icon hlm name="lucideArrowUp" hlmMenuIcon />
+          Asc
+        </button>
+        <button hlmMenuItem (click)="column.toggleSorting(true)">
+          <ng-icon hlm name="lucideArrowDown" hlmMenuIcon />
+          Desc
+        </button>
+        <hlm-menu-separator />
+        <button hlmMenuItem (click)="column.toggleVisibility(false)">
+          <ng-icon hlm name="lucideEyeOff" hlmMenuIcon />
+          Hide
+        </button>
+      </hlm-menu>
+    </ng-template>
+  </ng-template>
+</div>

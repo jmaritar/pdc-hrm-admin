@@ -1,7 +1,7 @@
 <div class="p-6 border-muted/20 bg-background border rounded-xl over">
   <button hlmBtn (click)="onCreateUser()">Agregar Usuario</button>
 
-  <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table>
+  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
 
   <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
     <hlm-dialog-content *brnDialogContent="let ctx">
@@ -100,15 +100,24 @@
   <hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="onModalClose()">
     <hlm-dialog-content *brnDialogContent="let ctx">
       <hlm-dialog-header class="max-w-md">
-        <h3 hlmDialogTitle>Confirmar Desactivación</h3>
+        <h3 hlmDialogTitle>
+          {{ selectedUser?.is_active ? 'Confirmar Desactivación' : 'Confirmar Activación' }}
+        </h3>
         <p hlmDialogDescription>
-          ¿Estás seguro de que deseas desactivar a {{ selectedUser?.name }}?
+          ¿Estás seguro de que deseas
+          {{ selectedUser?.is_active ? 'desactivar' : 'activar' }} a {{ selectedUser?.name }}?
         </p>
       </hlm-dialog-header>
 
       <hlm-dialog-footer>
         <button hlmBtn variant="default" (click)="onModalClose()">Cancelar</button>
-        <button hlmBtn variant="destructive" (click)="onConfirmDeactivation()">Desactivar</button>
+        <button
+          hlmBtn
+          [variant]="selectedUser?.is_active ? 'destructive' : 'secondary'"
+          (click)="onConfirmDeactivation()"
+        >
+          {{ selectedUser?.is_active ? 'Desactivar' : 'Activar' }}
+        </button>
       </hlm-dialog-footer>
     </hlm-dialog-content>
   </hlm-dialog>

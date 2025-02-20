@@ -1,0 +1,11 @@
+<div>
+  <button hlmBtn (click)="count.set(count() + 1)">Increment</button>
+  <button hlmBtn (click)="count.set(count() - 1)">Decrement</button>
+  <button hlmBtn (click)="showCounter.set(!showCounter())">Toggle Counter</button>
+
+  <p>{{ conditionalCount() }}</p>
+
+  <div>
+    <app-data-table-toolbar [count]="count" [showCounter]="showCounter" />
+  </div>
+</div>

@@ -4,18 +4,18 @@ import { Component, computed, effect, signal, TrackByFunction } from '@angular/c
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
-import { provideIcons } from '@ng-icons/core';
 import { lucideArrowUpDown, lucideChevronDown, lucideEllipsis } from '@ng-icons/lucide';
 import { BrnMenuTriggerDirective } from '@spartan-ng/brain/menu';
 import { BrnSelectModule } from '@spartan-ng/brain/select';
 import { BrnTableModule, PaginatorState, useBrnColumnManager } from '@spartan-ng/brain/table';
-import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
+import { HlmButtonModule } from '@spartan-ng/ui-button-helm';
 import { HlmCheckboxComponent } from '@spartan-ng/ui-checkbox-helm';
-import { HlmIconDirective } from '@spartan-ng/ui-icon-helm';
+import { HlmIconDirective, provideIcons } from '@spartan-ng/ui-icon-helm';
 import { HlmInputDirective } from '@spartan-ng/ui-input-helm';
 import { HlmMenuModule } from '@spartan-ng/ui-menu-helm';
 import { HlmSelectModule } from '@spartan-ng/ui-select-helm';
 import { HlmTableModule } from '@spartan-ng/ui-table-helm';
+import { hlmMuted } from '@spartan-ng/ui-typography-helm';
 import { debounceTime, map } from 'rxjs';
 
 export type Payment = {
@@ -147,8 +147,9 @@ const PAYMENT_DATA: Payment[] = [
     email: 'samantha.richards@yahoo.com',
   },
 ];
+
 @Component({
-  selector: 'app-data-table',
+  selector: 'spartan-data-table-preview',
   standalone: true,
   imports: [
     FormsModule,
@@ -159,7 +160,7 @@ const PAYMENT_DATA: Payment[] = [
     BrnTableModule,
     HlmTableModule,
 
-    HlmButtonDirective,
+    HlmButtonModule,
 
     DecimalPipe,
     TitleCasePipe,
@@ -173,11 +174,169 @@ const PAYMENT_DATA: Payment[] = [
   ],
   providers: [provideIcons({ lucideChevronDown, lucideEllipsis, lucideArrowUpDown })],
   host: {
-    class: 'w-full border-muted/20 bg-background border rounded-xl p-6',
+    class: 'w-full',
   },
-  templateUrl: './data-table.component.html',
+  template: `
+    <div class="flex flex-col justify-between gap-4 sm:flex-row">
+      <input
+        hlmInput
+        class="w-full md:w-80"
+        placeholder="Filter emails..."
+        [ngModel]="_emailFilter()"
+        (ngModelChange)="_rawFilterInput.set($event)"
+      />
+
+      <button hlmBtn variant="outline" align="end" [brnMenuTriggerFor]="menu">
+        Columns
+        <ng-icon hlm name="lucideChevronDown" class="ml-2" size="sm" />
+      </button>
+      <ng-template #menu>
+        <hlm-menu class="w-32">
+          @for (column of _brnColumnManager.allColumns; track column.name) {
+            <button
+              hlmMenuItemCheckbox
+              [disabled]="_brnColumnManager.isColumnDisabled(column.name)"
+              [checked]="_brnColumnManager.isColumnVisible(column.name)"
+              (triggered)="_brnColumnManager.toggleVisibility(column.name)"
+            >
+              <hlm-menu-item-check />
+              <span>{{ column.label }}</span>
+            </button>
+          }
+        </hlm-menu>
+      </ng-template>
+    </div>
+
+    <brn-table
+      hlm
+      stickyHeader
+      class="border-border mt-4 block h-[335px] overflow-auto rounded-md border"
+      [dataSource]="_filteredSortedPaginatedPayments()"
+      [displayedColumns]="_allDisplayedColumns()"
+      [trackBy]="_trackBy"
+    >
+      <brn-column-def name="select" class="w-12">
+        <hlm-th *brnHeaderDef>
+          <hlm-checkbox [checked]="_checkboxState()" (changed)="handleHeaderCheckboxChange()" />
+        </hlm-th>
+        <hlm-td *brnCellDef="let element">
+          <hlm-checkbox
+            [checked]="_isPaymentSelected(element)"
+            (changed)="togglePayment(element)"
+          />
+        </hlm-td>
+      </brn-column-def>
+      <brn-column-def name="status" class="w-32 sm:w-40">
+        <hlm-th truncate *brnHeaderDef>Status</hlm-th>
+        <hlm-td truncate *brnCellDef="let element">
+          {{ element.status | titlecase }}
+        </hlm-td>
+      </brn-column-def>
+      <brn-column-def name="email" class="w-60 lg:flex-1">
+        <hlm-th *brnHeaderDef>
+          <button hlmBtn size="sm" variant="ghost" (click)="handleEmailSortChange()">
+            Email
+            <ng-icon hlm class="ml-3" size="sm" name="lucideArrowUpDown" />
+          </button>
+        </hlm-th>
+        <hlm-td truncate *brnCellDef="let element">
+          {{ element.email }}
+        </hlm-td>
+      </brn-column-def>
+      <brn-column-def name="amount" class="justify-end w-20">
+        <hlm-th *brnHeaderDef>Amount</hlm-th>
+        <hlm-td class="font-medium tabular-nums" *brnCellDef="let element">
+          $ {{ element.amount | number: '1.2-2' }}
+        </hlm-td>
+      </brn-column-def>
+      <brn-column-def name="actions" class="w-16">
+        <hlm-th *brnHeaderDef></hlm-th>
+        <hlm-td *brnCellDef="let element">
+          <button
+            hlmBtn
+            variant="ghost"
+            class="h-6 w-6 p-0.5"
+            align="end"
+            [brnMenuTriggerFor]="menu"
+          >
+            <ng-icon hlm size="sm" name="lucideEllipsis" />
+          </button>
+
+          <ng-template #menu>
+            <hlm-menu>
+              <hlm-menu-label>Actions</hlm-menu-label>
+              <hlm-menu-separator />
+              <hlm-menu-group>
+                <button hlmMenuItem>Copy payment ID</button>
+              </hlm-menu-group>
+              <hlm-menu-separator />
+              <hlm-menu-group>
+                <button hlmMenuItem>View customer</button>
+                <button hlmMenuItem>View payment details</button>
+              </hlm-menu-group>
+            </hlm-menu>
+          </ng-template>
+        </hlm-td>
+      </brn-column-def>
+      <div class="flex items-center justify-center p-20 text-muted-foreground" brnNoDataRow>
+        No data
+      </div>
+    </brn-table>
+    <div
+      class="flex flex-col justify-between mt-4 sm:flex-row sm:items-center"
+      *brnPaginator="
+        let ctx;
+        totalElements: _totalElements();
+        pageSize: _pageSize();
+        onStateChange: _onStateChange
+      "
+    >
+      <span class="text-sm text-muted-foreground text-sm"
+        >{{ _selected().length }} of {{ _totalElements() }} row(s) selected</span
+      >
+      <div class="flex mt-2 sm:mt-0">
+        <brn-select
+          class="inline-block"
+          placeholder="{{ _availablePageSizes[0] }}"
+          [(ngModel)]="_pageSize"
+        >
+          <hlm-select-trigger class="inline-flex mr-1 w-15 h-9">
+            <hlm-select-value />
+          </hlm-select-trigger>
+          <hlm-select-content>
+            @for (size of _availablePageSizes; track size) {
+              <hlm-option [value]="size">
+                {{ size === 10000 ? 'All' : size }}
+              </hlm-option>
+            }
+          </hlm-select-content>
+        </brn-select>
+
+        <div class="flex space-x-1">
+          <button
+            size="sm"
+            variant="outline"
+            hlmBtn
+            [disabled]="!ctx.decrementable()"
+            (click)="ctx.decrement()"
+          >
+            Previous
+          </button>
+          <button
+            size="sm"
+            variant="outline"
+            hlmBtn
+            [disabled]="!ctx.incrementable()"
+            (click)="ctx.increment()"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  `,
 })
-export class DataTableComponent {
+export class DataTablePreviewComponent {
   protected readonly _rawFilterInput = signal('');
   protected readonly _emailFilter = signal('');
   private readonly _debouncedFilter = toSignal(

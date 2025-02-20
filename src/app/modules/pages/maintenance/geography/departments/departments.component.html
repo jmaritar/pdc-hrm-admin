@@ -1,1 +1,90 @@
-<p>departments works!</p>
+<div class="p-6 border-muted/20 bg-background border rounded-xl">
+  <button hlmBtn (click)="onCreateDepartment()">Agregar Departamento</button>
+
+  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
+
+  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
+    <hlm-dialog-content *brnDialogContent="let ctx">
+      <hlm-dialog-header class="max-w-xl md:min-w-md">
+        <h3 hlmDialogTitle>
+          {{ selectedDepartment ? 'Actualizar Departamento' : 'Crear Departamento' }}
+        </h3>
+        <p hlmDialogDescription>
+          {{
+            selectedDepartment
+              ? 'Actualice los detalles del departamento.'
+              : 'Complete los detalles para crear un nuevo departamento.'
+          }}
+        </p>
+      </hlm-dialog-header>
+
+      <form [formGroup]="form" class="space-y-6">
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Nombre del departamento
+            <input
+              aria-label="Nombre"
+              formControlName="name"
+              autocomplete="off"
+              class="mt-1.5 w-full"
+              hlmInput
+              type="text"
+              placeholder="Nombre"
+            />
+          </label>
+          <hlm-error>El nombre es requerido</hlm-error>
+        </hlm-form-field>
+
+        <hlm-form-field>
+          <label class="block" hlmLabel>
+            Código del departamento
+            <input
+              aria-label="Código"
+              formControlName="code"
+              class="mt-1.5 w-full"
+              hlmInput
+              autocomplete="off"
+              type="text"
+              placeholder="Código"
+              maxlength="5"
+            />
+          </label>
+          <hlm-error>El código es requerido y debe tener máximo 5 caracteres</hlm-error>
+        </hlm-form-field>
+      </form>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
+        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
+          {{ selectedDepartment ? 'Actualizar' : 'Crear' }}
+        </button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+
+  <hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="onModalClose()">
+    <hlm-dialog-content *brnDialogContent="let ctx">
+      <hlm-dialog-header class="max-w-md">
+        <h3 hlmDialogTitle>
+          {{ selectedDepartment?.is_active ? 'Confirmar Desactivación' : 'Confirmar Activación' }}
+        </h3>
+        <p hlmDialogDescription>
+          ¿Estás seguro de que deseas
+          {{ selectedDepartment?.is_active ? 'desactivar' : 'activar' }} a
+          {{ selectedDepartment?.name }}?
+        </p>
+      </hlm-dialog-header>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="default" (click)="onModalClose()">Cancelar</button>
+        <button
+          hlmBtn
+          [variant]="selectedDepartment?.is_active ? 'destructive' : 'secondary'"
+          (click)="onConfirmDeactivation()"
+        >
+          {{ selectedDepartment?.is_active ? 'Desactivar' : 'Activar' }}
+        </button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+</div>
