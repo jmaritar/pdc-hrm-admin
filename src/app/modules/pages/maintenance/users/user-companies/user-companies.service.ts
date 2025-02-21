@@ -11,10 +11,10 @@ import { environment } from '@env/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class UsersCompanyService {
+export class UserCompaniesService {
   private _http = inject(HttpClient);
   private _storage = inject(StorageService);
-  private API_URL = `${environment.API_URL}/user-companies`;
+  private API_URL = `${environment.API_URL}/users`;
 
   // Obtener todas las empresas
   getCompanies(): Observable<any> {
@@ -26,10 +26,19 @@ export class UsersCompanyService {
     );
   }
 
+  getCompaniesAvaibles(userId: string): Observable<any> {
+    return this._http.post(`${this.API_URL}/find-available-companies`, { user_id: userId }).pipe(
+      catchError(error => {
+        toast.error('Error al obtener las empresas');
+        return throwError(() => new Error(error));
+      })
+    );
+  }
+
   // ✅ Asignar un usuario a una empresa
   assignUserToCompany(userId: string, companyId: string): Observable<any> {
     return this._http
-      .post(`${this.API_URL}/assign`, { user_id: userId, company_id: companyId })
+      .post(`${this.API_URL}/assign-company`, { user_id: userId, company_id: companyId })
       .pipe(
         catchError(error => {
           toast.error('Error al asignar el usuario a la empresa');
@@ -73,7 +82,9 @@ export class UsersCompanyService {
   // ✅ Remover un usuario de una empresa
   removeUserFromCompany(userId: string, companyId: string): Observable<any> {
     return this._http
-      .delete(`${this.API_URL}/remove`, { body: { user_id: userId, company_id: companyId } })
+      .delete(`${this.API_URL}/remove-company-from-user`, {
+        body: { user_id: userId, company_id: companyId },
+      })
       .pipe(
         catchError(error => {
           toast.error('Error al remover el usuario de la empresa');

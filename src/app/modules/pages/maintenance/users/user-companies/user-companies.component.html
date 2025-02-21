@@ -1,0 +1,136 @@
+<div class="p-6 border-muted/20 bg-background border rounded-xl shadow-md">
+  <!-- 📌 Breadcrumb -->
+  <nav hlmBreadcrumb class="mb-4">
+    <ol hlmBreadcrumbList class="flex items-center gap-x-2">
+      <!-- Home -->
+      <li hlmBreadcrumbItem>
+        <a class="inline-flex items-center gap-1" hlmBreadcrumbLink [link]="'/home'">
+          <ng-icon size="sm" hlm name="lucideHouse" />
+          <p>Home</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
+
+      <!-- Usuarios -->
+      <li hlmBreadcrumbItem>
+        <a class="inline-flex items-center gap-1" hlmBreadcrumbLink [link]="'/maintenance/users'">
+          <ng-icon size="sm" hlm name="lucideUsers" />
+
+          <p>Usuarios</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
+
+      <!-- Compañías del usuario -->
+      <li hlmBreadcrumbItem>
+        <ng-icon class="inline-flex items-center gap-1" size="sm" hlm name="lucideBuilding2" />
+        <span hlmBreadcrumbPage>Compañías del usuario: {{ userName }}</span>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- 📌 Loading -->
+  @if (isLoading) {
+    <div class="flex flex-col justify-center items-center p-10 text-muted-foreground gap-2">
+      <span class="text-lg font-medium">Cargando empresas del usuario...</span>
+      <ng-icon size="sm" hlm size="xl" name="lucideLoader" class="animate-spin" />
+    </div>
+  }
+
+  <!-- 📌 Error al cargar -->
+  @if (hasError) {
+    <div class="flex flex-col items-center justify-center p-10 text-center">
+      <p class="text-destructive mb-4 text-lg font-medium">
+        Hubo un error al cargar las empresas del usuario.
+      </p>
+      <button hlmBtn variant="outline" (click)="loadUserCompanies()">Reintentar</button>
+    </div>
+  }
+
+  <!-- 📌 Tabla con empresas asignadas y opción para agregar una nueva -->
+  @if (!isLoading && isDataLoaded) {
+    <app-data-table
+      [data]="data"
+      [columns]="columns"
+      [filterKey]="'trade_name'"
+      [showEdit]="false"
+      [showDelete]="true"
+      (isOnNew)="openModal()"
+      (deleteRow)="openConfirmationDialog($event)"
+    />
+  }
+</div>
+
+<!-- ✅ Diálogo para Asignar Empresa -->
+<hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content
+    *brnDialogContent="let ctx"
+    class="min-w-[98svw] md:min-w-lg p-6 bg-white rounded-lg"
+  >
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle class="text-lg font-semibold text-gray-800">Asignar Empresa</h3>
+    </hlm-dialog-header>
+
+    <form [formGroup]="form" class="space-y-4">
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Seleccionar empresa
+          <select formControlName="company_id" hlmInput class="mt-1 w-full">
+            <option *ngFor="let company of companies" [value]="company.id_company">
+              {{ company.trade_name }} ({{ company.nit }})
+            </option>
+          </select>
+        </label>
+      </hlm-form-field>
+    </form>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        class="bg-blue-600 text-white hover:bg-blue-700"
+        [disabled]="form.invalid || isSubmitting"
+        (click)="assignUserToCompany()"
+      >
+        <ng-container *ngIf="isSubmitting; else normalText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #normalText> Asignar </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>
+
+<!-- ✅ Diálogo de Confirmación para Eliminar Empresa -->
+<hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content *brnDialogContent="let ctx" class="max-w-lg mx-auto p-6 bg-white rounded-lg">
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle class="text-lg font-semibold text-red-600">Confirmar Eliminación</h3>
+    </hlm-dialog-header>
+
+    <p class="text-gray-700 text-sm">
+      ¿Estás seguro de que deseas eliminar la empresa
+      <span class="font-semibold">
+        {{ selectedCompany?.trade_name }}
+      </span>
+      de este usuario? Esta acción no se puede deshacer.
+    </p>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        class="bg-red-600 text-white hover:bg-red-700"
+        [disabled]="isSubmitting"
+        (click)="removeUserFromCompany()"
+      >
+        <ng-container *ngIf="isSubmitting; else deleteText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #deleteText> Eliminar </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>

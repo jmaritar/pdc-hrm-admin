@@ -1,1 +1,50 @@
-<p>audit-logs works!</p>
+<div class="p-6 border-muted/20 bg-background border rounded-xl shadow-md">
+  <!-- 📌 Breadcrumb -->
+  <nav hlmBreadcrumb class="mb-4">
+    <ol hlmBreadcrumbList class="flex items-center gap-x-2">
+      <!-- Home -->
+      <li hlmBreadcrumbItem>
+        <a class="inline-flex items-center gap-1" hlmBreadcrumbLink [link]="'/home'">
+          <ng-icon size="sm" hlm name="lucideUsers" />
+          <p>Home</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
+
+      <!-- Auditoría -->
+      <li hlmBreadcrumbItem>
+        <ng-icon class="inline-flex items-center gap-1" size="sm" hlm name="lucideFileText" />
+        <span hlmBreadcrumbPage>Logs de Auditoría</span>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- 📌 Loading -->
+  @if (isLoading) {
+    <div class="flex flex-col justify-center items-center p-10 text-muted-foreground gap-2">
+      <span class="text-lg font-medium">Cargando logs de auditoría...</span>
+      <ng-icon size="sm" hlm size="xl" name="lucideLoader" class="animate-spin" />
+    </div>
+  }
+
+  <!-- 📌 Error al cargar -->
+  @if (hasError) {
+    <div class="flex flex-col items-center justify-center p-10 text-center">
+      <p class="text-destructive mb-4 text-lg font-medium">
+        Hubo un error al cargar los logs de auditoría.
+      </p>
+      <button hlmBtn variant="outline" (click)="loadAuditLogs()">Reintentar</button>
+    </div>
+  }
+
+  <!-- 📌 Tabla con logs -->
+  @if (!isLoading && isDataLoaded) {
+    <app-data-table
+      [data]="data"
+      [columns]="columns"
+      [filterKey]="'table_name'"
+      [showEdit]="false"
+      [showDelete]="false"
+    />
+  }
+</div>

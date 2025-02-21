@@ -3,7 +3,7 @@ import { Component, inject, Input } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideUsers } from '@ng-icons/lucide';
+import { lucideBuilding2 } from '@ng-icons/lucide';
 import { HlmIconDirective } from '@spartan-ng/ui-icon-helm';
 import { Row } from '@tanstack/angular-table';
 
@@ -19,7 +19,7 @@ interface UserCompany {
   imports: [CommonModule, HlmIconDirective, NgIcon],
   providers: [
     provideIcons({
-      lucideUsers,
+      lucideBuilding2,
     }),
   ],
   template: `
@@ -39,7 +39,7 @@ interface UserCompany {
                shadow-lg hover:bg-blue-700 transition"
         (click)="navigateToUserCompanies()"
       >
-        <ng-icon hlm size="sm" name="lucideUsers" />
+        <ng-icon hlm size="sm" name="lucideBuilding2" />
       </button>
     </div>
   `,

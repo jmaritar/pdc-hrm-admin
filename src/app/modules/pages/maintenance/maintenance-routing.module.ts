@@ -13,9 +13,7 @@ const routes: Routes = [
     path: 'users/companies/:id_user',
     canActivate: [hasRoleGuard(['SUPER_ADMIN'])],
     loadComponent: () =>
-      import('./users/users-companies/users-companies.component').then(
-        m => m.UsersCompaniesComponent
-      ),
+      import('./users/user-companies/user-companies.component').then(m => m.UserCompaniesComponent),
   },
   {
     path: 'collaborators',
