@@ -6,6 +6,5 @@ import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
   selector: 'app-reports',
   imports: [HlmButtonDirective],
   templateUrl: './reports.component.html',
-  styleUrl: './reports.component.css',
 })
 export class ReportsComponent {}

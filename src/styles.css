@@ -6,7 +6,7 @@ layer(base);
 @import 'tailwindcss';
 
 /** Plugins **/
-/* @import './assets/styles/apexchart.css'; */
+@import './assets/styles/apexchart.css';
 
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";

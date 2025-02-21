@@ -1,44 +1,141 @@
-<div class="space-y-4">
-  <app-data-table-toolbar [table]="table" />
-  <div class="rounded-md border">
-    <table>
-      <thead>
-        @for (headerGroup of table.getHeaderGroups(); track headerGroup.id) {
-          <tr>
-            @for (header of headerGroup.headers; track header.id) {
-              @if (!header.isPlaceholder) {
-                <th>
-                  <ng-container
-                    *flexRender="
-                      header.column.columnDef.header;
-                      props: header.getContext();
-                      let header
-                    "
-                  >
-                    <div [innerHTML]="header"></div>
-                  </ng-container>
-                </th>
-              }
-            }
-          </tr>
-        }
-      </thead>
+<div class="grid gap-2">
+  <app-data-table-toolbar
+    *ngIf="table()"
+    [table]="table()"
+    [filterKey]="filterKey"
+    (isOnNew)="emitNewEvent()"
+  />
 
-      <tbody>
-        @for (row of table.getRowModel().rows; track row.id) {
-          <tr>
-            @for (cell of row.getVisibleCells(); track cell.id) {
-              <td>
-                <ng-container
-                  *flexRender="cell.column.columnDef.cell; props: cell.getContext(); let cell"
-                >
-                  <div [innerHTML]="cell"></div>
-                </ng-container>
+  @if (data.length === 0) {
+    <div class="flex flex-col items-center justify-center p-10 gap-2">
+      <div class="flex flex-col items-center text-muted-foreground justify-center mb-4">
+        <p>No hay datos disponibles.</p>
+        <ng-icon hlm size="xl" name="lucideCloudOff" />
+      </div>
+      <button hlmBtn (click)="emitNewEvent()">Agregar Nuevo</button>
+    </div>
+  } @else {
+    <div class="rounded-md border relative w-full overflow-auto border-border block max-h-[300px]">
+      <table class="w-full caption-bottom text-sm">
+        <thead class="[&_tr]:border-b sticky top-0 z-[5] bg-card text-card-foreground">
+          @for (headerGroup of table().getHeaderGroups(); track headerGroup.id) {
+            <tr
+              class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted text-muted-foreground"
+            >
+              @for (header of headerGroup.headers; track header.id) {
+                @if (!header.isPlaceholder) {
+                  <th
+                    class="h-10 px-2 text-left align-middle font-medium text-muted-foreground"
+                    [style.width.px]="header.column.getSize()"
+                  >
+                    <ng-container
+                      *flexRender="
+                        header.column.columnDef.header;
+                        props: header.getContext();
+                        let header
+                      "
+                    >
+                      <div [innerHTML]="header"></div>
+                    </ng-container>
+                  </th>
+                }
+              }
+            </tr>
+          }
+        </thead>
+
+        <tbody class="[&_tr:last-child]:border-0">
+          @if (!hasFilteredData()) {
+            <tr>
+              <td
+                [attr.colspan]="columns.length"
+                class="text-center h-44 p-4 text-muted-foreground"
+              >
+                <div class="flex flex-col items-center text-muted-foreground justify-center">
+                  <p class="mb-4">No se encontraron datos con el filtro aplicado.</p>
+                  <ng-icon hlm size="xl" name="lucideCloudOff" />
+                </div>
               </td>
+            </tr>
+          } @else {
+            @for (row of table().getRowModel().rows; track row.id) {
+              <tr
+                class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted text-muted-foreground"
+              >
+                @for (cell of row.getVisibleCells(); track cell.id) {
+                  <td class="p-2 align-middle group" [style.width.px]="cell.column.getSize()">
+                    @if (cell.column.id === 'actions') {
+                      <button
+                        hlmBtn
+                        variant="outline"
+                        class="h-6 w-6 p-0.5 bg-card"
+                        align="end"
+                        [brnMenuTriggerFor]="menu"
+                      >
+                        <ng-icon hlm size="sm" name="lucideEllipsis" />
+                      </button>
+
+                      <ng-template #menu>
+                        <hlm-menu
+                          class="bg-background border border-border rounded-md p-2 text-foreground"
+                        >
+                          <hlm-menu-label>Acciones</hlm-menu-label>
+                          <hlm-menu-separator />
+                          <hlm-menu-group class="space-y-1">
+                            @if (showEdit) {
+                              <button
+                                hlmMenuItem
+                                (click)="emitEdit(row)"
+                                class="bg-blue-50 hover:bg-blue-100 text-blue-500 hover:text-blue-600 dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
+                              >
+                                <ng-icon hlm name="lucideSquarePen" hlmMenuIcon />
+                                Editar
+                              </button>
+                            }
+                            @if (showDisable) {
+                              <button
+                                hlmMenuItem
+                                (click)="emitDisable(row)"
+                                [ngClass]="{
+                                  'bg-red-50 hover:bg-yellow-100 text-yellow-500 hover:text-yellow-600 dark:bg-yellow-900 dark:hover:bg-yellow-800 dark:text-yellow-300 dark:hover:text-yellow-200':
+                                    isRowActive(row),
+                                  'bg-green-50 hover:bg-green-100 text-green-500 hover:text-green-600 dark:bg-green-900 dark:hover:bg-green-800 dark:text-green-300 dark:hover:text-green-200':
+                                    !isRowActive(row),
+                                }"
+                              >
+                                <ng-icon hlm name="lucideBan" hlmMenuIcon />
+                                {{ isRowActive(row) ? 'Deshabilitar' : 'Activar' }}
+                              </button>
+                            }
+                            @if (showDelete) {
+                              <button
+                                hlmMenuItem
+                                (click)="emitDelete(row)"
+                                class="bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 dark:bg-red-900 dark:hover:bg-red-800 dark:text-red-300 dark:hover:text-red-200"
+                              >
+                                <ng-icon hlm name="lucideTrash2" hlmMenuIcon />
+                                Eliminar
+                              </button>
+                            }
+                          </hlm-menu-group>
+                        </hlm-menu>
+                      </ng-template>
+                    } @else {
+                      <ng-container
+                        *flexRender="cell.column.columnDef.cell; props: cell.getContext(); let cell"
+                      >
+                        <div [innerHTML]="cell"></div>
+                      </ng-container>
+                    }
+                  </td>
+                }
+              </tr>
             }
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <app-data-table-pagination *ngIf="table()" [table]="table()"></app-data-table-pagination>
 </div>

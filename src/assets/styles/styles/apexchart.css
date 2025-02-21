@@ -1,5 +1,6 @@
 /** Apexchart **/
 .apexcharts-tooltip {
+
   /** Dark mode */
   &.apexcharts-theme-dark {
     box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.2);
@@ -42,6 +43,7 @@
 }
 
 .apexcharts-xaxistooltip {
+
   /** Dark mode */
   &.apexcharts-theme-dark {
     border-radius: 0.475rem;

@@ -36,13 +36,13 @@ const routes: Routes = [
       import('./geography/countries/countries.component').then(m => m.CountriesComponent),
   },
   {
-    path: 'geography/departments',
+    path: 'geography/countries/departments/:id_country',
     canActivate: [hasRoleGuard(['SUPER_ADMIN', 'ADMIN'])],
     loadComponent: () =>
       import('./geography/departments/departments.component').then(m => m.DepartmentsComponent),
   },
   {
-    path: 'geography/municipalities',
+    path: 'geography/countries/departments/municipalities',
     canActivate: [hasRoleGuard(['SUPER_ADMIN', 'ADMIN'])],
     loadComponent: () =>
       import('./geography/municipalities/municipalities.component').then(

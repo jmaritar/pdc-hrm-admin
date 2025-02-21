@@ -1,87 +1,133 @@
-<div class="p-6 border-muted/20 bg-background border rounded-xl">
-  <button hlmBtn (click)="onCreateCountry()">Agregar País</button>
+<div class="p-6 border-muted/20 bg-background border rounded-xl shadow-md">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold text-primary">Gestión de Países</h2>
+  </div>
 
-  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
+  @if (isLoading) {
+    <div class="flex flex-col justify-center items-center p-10 text-muted-foreground gap-2">
+      <span class="text-lg font-medium">Cargando países...</span>
+      <ng-icon hlm size="xl" name="lucideLoader" class="animate-spin" />
+    </div>
+  }
 
-  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
-    <hlm-dialog-content *brnDialogContent="let ctx">
-      <hlm-dialog-header class="max-w-xl md:min-w-md">
-        <h3 hlmDialogTitle>{{ selectedCountry ? 'Actualizar País' : 'Crear País' }}</h3>
-        <p hlmDialogDescription>
-          {{
-            selectedCountry
-              ? 'Actualice los detalles del país.'
-              : 'Complete los detalles para crear un nuevo país.'
-          }}
-        </p>
-      </hlm-dialog-header>
+  @if (hasError) {
+    <div class="flex flex-col items-center justify-center p-10 text-center">
+      <p class="text-destructive mb-4 text-lg font-medium">Hubo un error al cargar los países.</p>
+      <button hlmBtn variant="outline" (click)="loadCountries()">Reintentar</button>
+    </div>
+  }
 
-      <form [formGroup]="form" class="space-y-6">
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Nombre del país
-            <input
-              aria-label="Nombre"
-              formControlName="name"
-              autocomplete="off"
-              class="mt-1.5 w-full"
-              hlmInput
-              type="text"
-              placeholder="Nombre"
-            />
-          </label>
-          <hlm-error>El nombre es requerido</hlm-error>
-        </hlm-form-field>
-
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Código del país
-            <input
-              aria-label="Código"
-              formControlName="code"
-              class="mt-1.5 w-full"
-              hlmInput
-              autocomplete="off"
-              type="text"
-              placeholder="Código"
-              maxlength="3"
-            />
-          </label>
-          <hlm-error>El código es requerido y debe tener máximo 3 caracteres</hlm-error>
-        </hlm-form-field>
-      </form>
-
-      <hlm-dialog-footer>
-        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
-        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
-          {{ selectedCountry ? 'Actualizar' : 'Crear' }}
-        </button>
-      </hlm-dialog-footer>
-    </hlm-dialog-content>
-  </hlm-dialog>
-
-  <hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="onModalClose()">
-    <hlm-dialog-content *brnDialogContent="let ctx">
-      <hlm-dialog-header class="max-w-md">
-        <h3 hlmDialogTitle>
-          {{ selectedCountry?.is_active ? 'Confirmar Desactivación' : 'Confirmar Activación' }}
-        </h3>
-        <p hlmDialogDescription>
-          ¿Estás seguro de que deseas
-          {{ selectedCountry?.is_active ? 'desactivar' : 'activar' }} a {{ selectedCountry?.name }}?
-        </p>
-      </hlm-dialog-header>
-
-      <hlm-dialog-footer>
-        <button hlmBtn variant="default" (click)="onModalClose()">Cancelar</button>
-        <button
-          hlmBtn
-          [variant]="selectedCountry?.is_active ? 'destructive' : 'secondary'"
-          (click)="onConfirmDeactivation()"
-        >
-          {{ selectedCountry?.is_active ? 'Desactivar' : 'Activar' }}
-        </button>
-      </hlm-dialog-footer>
-    </hlm-dialog-content>
-  </hlm-dialog>
+  @if (!isLoading && isDataLoaded) {
+    <app-data-table
+      [data]="data"
+      [columns]="columns"
+      [filterKey]="'name'"
+      [showEdit]="true"
+      [showDisable]="true"
+      (isOnNew)="openModal()"
+      (editRow)="openModal($event)"
+      (disableRow)="openConfirmationDialog($event)"
+    />
+  }
 </div>
+
+<!-- ✅ Dialogo para Crear/Editar -->
+<hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content
+    *brnDialogContent="let ctx"
+    class="min-w-[98svw] md:min-w-lg p-6 bg-white rounded-lg"
+  >
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle class="text-lg font-semibold text-gray-800">
+        {{ selectedCountry ? 'Actualizar País' : 'Crear País' }}
+      </h3>
+    </hlm-dialog-header>
+
+    <form [formGroup]="form" class="space-y-4">
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Nombre del país
+          <input formControlName="name" hlmInput class="mt-1 w-full" placeholder="Ej. Guatemala" />
+        </label>
+      </hlm-form-field>
+
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Código del país
+          <input
+            formControlName="code"
+            hlmInput
+            class="mt-1 w-full"
+            placeholder="Ej. GT"
+            maxlength="3"
+          />
+        </label>
+      </hlm-form-field>
+    </form>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        class="bg-blue-600 text-white hover:bg-blue-700"
+        [disabled]="form.invalid || isSubmitting"
+        (click)="saveCountry()"
+      >
+        <ng-container *ngIf="isSubmitting; else normalText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #normalText>
+          {{ selectedCountry ? 'Actualizar' : 'Guardar' }}
+        </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>
+
+<!-- ✅ Dialogo de Confirmación para Activar/Desactivar -->
+<hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content *brnDialogContent="let ctx" class="max-w-lg mx-auto p-6 bg-white rounded-lg">
+    <hlm-dialog-header>
+      <h3
+        hlmDialogTitle
+        class="text-lg font-semibold"
+        [ngClass]="{
+          'text-red-600': selectedCountry?.is_active,
+          'text-green-600': !selectedCountry?.is_active,
+        }"
+      >
+        {{ selectedCountry?.is_active ? 'Confirmar Desactivación' : 'Confirmar Activación' }}
+      </h3>
+    </hlm-dialog-header>
+
+    <p class="text-gray-700 text-sm">
+      ¿Estás seguro de que deseas
+      <span class="font-semibold">
+        {{ selectedCountry?.is_active ? 'desactivar' : 'activar' }} a
+        {{ selectedCountry?.name }} </span
+      >? Esta acción no se puede deshacer.
+    </p>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        [ngClass]="{
+          'bg-red-600 hover:bg-red-700': selectedCountry?.is_active,
+          'bg-green-600 hover:bg-green-700': !selectedCountry?.is_active,
+        }"
+        [disabled]="isSubmitting"
+        (click)="toggleCountryStatus()"
+      >
+        <ng-container *ngIf="isSubmitting; else statusText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #statusText>
+          {{ selectedCountry?.is_active ? 'Desactivar' : 'Activar' }}
+        </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>

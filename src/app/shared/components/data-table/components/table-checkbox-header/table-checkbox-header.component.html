@@ -1,0 +1,7 @@
+<input
+  type="checkbox"
+  class="size-4"
+  [checked]="table.getIsAllPageRowsSelected()"
+  [indeterminate]="table.getIsSomePageRowsSelected()"
+  (change)="toggleSelected(($event.target as HTMLInputElement).checked)"
+/>

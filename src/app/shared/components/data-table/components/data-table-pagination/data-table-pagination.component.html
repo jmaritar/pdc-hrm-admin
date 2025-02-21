@@ -1,1 +1,79 @@
-<p>data-table-pagination works!</p>
+<div
+  class="flex flex-col sm:flex-row items-center text-xs sm:text-sm justify-between gap-2 sm:gap-4 text-muted-foreground"
+>
+  <!-- Información de filas seleccionadas -->
+  <div class="text-xs sm:text-sm text-muted-foreground text-center sm:text-left w-full sm:w-auto">
+    {{ table.getFilteredSelectedRowModel().rows.length }} de
+    {{ table.getFilteredRowModel().rows.length }} fila(s) seleccionadas.
+  </div>
+
+  <div
+    class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto"
+  >
+    <!-- Selector de filas por página -->
+    <div class="flex items-center space-x-2">
+      <p class="text-xs sm:text-sm min-w-32">Filas por página</p>
+      <select
+        class="border rounded-md p-1 text-xs sm:text-sm min-w-16"
+        [value]="table.getState().pagination.pageSize"
+        (change)="updatePageSize($event)"
+      >
+        <option *ngFor="let size of [5, 10, 25, 50, 100]" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Indicador de página actual -->
+    <div class="text-xs sm:text-sm">
+      Página {{ table.getState().pagination.pageIndex + 1 }} de {{ table.getPageCount() }}
+    </div>
+
+    <!-- Controles de paginación -->
+    <div class="flex items-center space-x-1 sm:space-x-2">
+      <button
+        hlmBtn
+        variant="outline"
+        class="h-7 w-7 p-0 hidden sm:flex"
+        (click)="table.setPageIndex(0)"
+        [disabled]="!table.getCanPreviousPage()"
+      >
+        <span class="sr-only">Ir a la primera página</span>
+        <ng-icon hlm name="lucideChevronsLeft" />
+      </button>
+
+      <button
+        hlmBtn
+        variant="outline"
+        class="h-7 w-7 p-0"
+        (click)="table.previousPage()"
+        [disabled]="!table.getCanPreviousPage()"
+      >
+        <span class="sr-only">Ir a la página anterior</span>
+        <ng-icon hlm name="lucideChevronLeft" />
+      </button>
+
+      <button
+        hlmBtn
+        variant="outline"
+        class="h-7 w-7 p-0"
+        (click)="table.nextPage()"
+        [disabled]="!table.getCanNextPage()"
+      >
+        <span class="sr-only">Ir a la página siguiente</span>
+        <ng-icon hlm name="lucideChevronRight" />
+      </button>
+
+      <button
+        hlmBtn
+        variant="outline"
+        class="h-7 w-7 p-0 hidden sm:flex"
+        (click)="table.setPageIndex(table.getPageCount() - 1)"
+        [disabled]="!table.getCanNextPage()"
+      >
+        <span class="sr-only">Ir a la última página</span>
+        <ng-icon hlm name="lucideChevronsRight" />
+      </button>
+    </div>
+  </div>
+</div>

@@ -15,7 +15,6 @@ import {
   HlmMenuComponent,
   HlmMenuItemDirective,
   HlmMenuItemIconDirective,
-  HlmMenuSeparatorComponent,
 } from '@spartan-ng/ui-menu-helm';
 import { Column } from '@tanstack/angular-table';
 
@@ -43,7 +42,6 @@ const columnNames: Record<string, string> = {
     HlmMenuComponent,
     HlmMenuItemDirective,
     HlmMenuItemIconDirective,
-    HlmMenuSeparatorComponent,
   ],
   providers: [provideIcons({ lucideArrowDown, lucideArrowUp, lucideChevronsUpDown, lucideEyeOff })],
   templateUrl: './data-table-column-header.component.html',

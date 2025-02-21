@@ -1,90 +1,140 @@
-<div class="p-6 border-muted/20 bg-background border rounded-xl">
-  <button hlmBtn (click)="onCreateDepartment()">Agregar Departamento</button>
+<div class="p-6 border-muted/20 bg-background border rounded-xl shadow-md">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold text-primary">Gestión de Departamentos</h2>
+  </div>
 
-  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
+  @if (isLoading) {
+    <div class="flex flex-col justify-center items-center p-10 text-muted-foreground gap-2">
+      <span class="text-lg font-medium">Cargando departamentos...</span>
+      <ng-icon hlm size="xl" name="lucideLoader" class="animate-spin" />
+    </div>
+  }
 
-  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
-    <hlm-dialog-content *brnDialogContent="let ctx">
-      <hlm-dialog-header class="max-w-xl md:min-w-md">
-        <h3 hlmDialogTitle>
-          {{ selectedDepartment ? 'Actualizar Departamento' : 'Crear Departamento' }}
-        </h3>
-        <p hlmDialogDescription>
-          {{
-            selectedDepartment
-              ? 'Actualice los detalles del departamento.'
-              : 'Complete los detalles para crear un nuevo departamento.'
-          }}
-        </p>
-      </hlm-dialog-header>
+  @if (hasError) {
+    <div class="flex flex-col items-center justify-center p-10 text-center">
+      <p class="text-destructive mb-4 text-lg font-medium">
+        Hubo un error al cargar los departamentos.
+      </p>
+      <button hlmBtn variant="outline" (click)="loadDepartments()">Reintentar</button>
+    </div>
+  }
 
-      <form [formGroup]="form" class="space-y-6">
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Nombre del departamento
-            <input
-              aria-label="Nombre"
-              formControlName="name"
-              autocomplete="off"
-              class="mt-1.5 w-full"
-              hlmInput
-              type="text"
-              placeholder="Nombre"
-            />
-          </label>
-          <hlm-error>El nombre es requerido</hlm-error>
-        </hlm-form-field>
-
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Código del departamento
-            <input
-              aria-label="Código"
-              formControlName="code"
-              class="mt-1.5 w-full"
-              hlmInput
-              autocomplete="off"
-              type="text"
-              placeholder="Código"
-              maxlength="5"
-            />
-          </label>
-          <hlm-error>El código es requerido y debe tener máximo 5 caracteres</hlm-error>
-        </hlm-form-field>
-      </form>
-
-      <hlm-dialog-footer>
-        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
-        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
-          {{ selectedDepartment ? 'Actualizar' : 'Crear' }}
-        </button>
-      </hlm-dialog-footer>
-    </hlm-dialog-content>
-  </hlm-dialog>
-
-  <hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="onModalClose()">
-    <hlm-dialog-content *brnDialogContent="let ctx">
-      <hlm-dialog-header class="max-w-md">
-        <h3 hlmDialogTitle>
-          {{ selectedDepartment?.is_active ? 'Confirmar Desactivación' : 'Confirmar Activación' }}
-        </h3>
-        <p hlmDialogDescription>
-          ¿Estás seguro de que deseas
-          {{ selectedDepartment?.is_active ? 'desactivar' : 'activar' }} a
-          {{ selectedDepartment?.name }}?
-        </p>
-      </hlm-dialog-header>
-
-      <hlm-dialog-footer>
-        <button hlmBtn variant="default" (click)="onModalClose()">Cancelar</button>
-        <button
-          hlmBtn
-          [variant]="selectedDepartment?.is_active ? 'destructive' : 'secondary'"
-          (click)="onConfirmDeactivation()"
-        >
-          {{ selectedDepartment?.is_active ? 'Desactivar' : 'Activar' }}
-        </button>
-      </hlm-dialog-footer>
-    </hlm-dialog-content>
-  </hlm-dialog>
+  @if (!isLoading && isDataLoaded) {
+    <app-data-table
+      [data]="data"
+      [columns]="columns"
+      [filterKey]="'name'"
+      [showEdit]="true"
+      [showDisable]="true"
+      (isOnNew)="openModal()"
+      (editRow)="openModal($event)"
+      (disableRow)="openConfirmationDialog($event)"
+    />
+  }
 </div>
+
+<!-- ✅ Dialogo para Crear/Editar -->
+<hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content
+    *brnDialogContent="let ctx"
+    class="min-w-[98svw] md:min-w-lg p-6 bg-white rounded-lg"
+  >
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle class="text-lg font-semibold text-gray-800">
+        {{ selectedDepartment ? 'Actualizar Departamento' : 'Crear Departamento' }}
+      </h3>
+    </hlm-dialog-header>
+
+    <form [formGroup]="form" class="space-y-4">
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Nombre del departamento
+          <input
+            formControlName="name"
+            hlmInput
+            class="mt-1 w-full"
+            placeholder="Ej. Ciudad de Guatemala"
+          />
+        </label>
+      </hlm-form-field>
+
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Código del departamento
+          <input
+            formControlName="code"
+            hlmInput
+            class="mt-1 w-full"
+            placeholder="Ej. RRHH"
+            maxlength="5"
+          />
+        </label>
+      </hlm-form-field>
+    </form>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        class="bg-blue-600 text-white hover:bg-blue-700"
+        [disabled]="form.invalid || isSubmitting"
+        (click)="saveDepartment()"
+      >
+        <ng-container *ngIf="isSubmitting; else normalText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #normalText>
+          {{ selectedDepartment ? 'Actualizar' : 'Guardar' }}
+        </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>
+
+<!-- ✅ Dialogo de Confirmación para Activar/Desactivar -->
+<hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content *brnDialogContent="let ctx" class="max-w-lg mx-auto p-6 bg-white rounded-lg">
+    <hlm-dialog-header>
+      <h3
+        hlmDialogTitle
+        class="text-lg font-semibold"
+        [ngClass]="{
+          'text-red-600': selectedDepartment?.is_active,
+          'text-green-600': !selectedDepartment?.is_active,
+        }"
+      >
+        {{ selectedDepartment?.is_active ? 'Confirmar Desactivación' : 'Confirmar Activación' }}
+      </h3>
+    </hlm-dialog-header>
+
+    <p class="text-gray-700 text-sm">
+      ¿Estás seguro de que deseas
+      <span class="font-semibold">
+        {{ selectedDepartment?.is_active ? 'desactivar' : 'activar' }} a
+        {{ selectedDepartment?.name }} </span
+      >? Esta acción no se puede deshacer.
+    </p>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        [ngClass]="{
+          'bg-red-600 hover:bg-red-700': selectedDepartment?.is_active,
+          'bg-green-600 hover:bg-green-700': !selectedDepartment?.is_active,
+        }"
+        [disabled]="isSubmitting"
+        (click)="toggleDepartmentStatus()"
+      >
+        <ng-container *ngIf="isSubmitting; else statusText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #statusText>
+          {{ selectedDepartment?.is_active ? 'Desactivar' : 'Activar' }}
+        </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>

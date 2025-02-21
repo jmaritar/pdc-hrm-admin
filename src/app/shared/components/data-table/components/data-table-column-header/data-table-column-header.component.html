@@ -1,15 +1,22 @@
-<div class="flex items-center space-x-2">
+<div class="flex items-center space-x-2 w-full">
   <div *ngIf="!column.getCanSort(); else sortable" class="flex items-center space-x-2">
     {{ columnTitle }}
   </div>
 
   <ng-template #sortable>
-    <div class="flex items-center space-x-2">
-      <button hlmBtn variant="ghost" size="sm" class="-ml-3 h-8" [brnMenuTriggerFor]="menu">
+    <div class="flex w-full items-center space-x-2">
+      <button
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        class="h-8 w-full justify-start"
+        [brnMenuTriggerFor]="menu"
+      >
         <span>{{ columnTitle }}</span>
         <ng-icon
           hlm
-          class="size-2"
+          class="ml-2"
+          size="sm"
           [name]="
             column.getIsSorted() === 'desc'
               ? 'lucideArrowDown'
@@ -31,11 +38,11 @@
           <ng-icon hlm name="lucideArrowDown" hlmMenuIcon />
           Desc
         </button>
-        <hlm-menu-separator />
+        <!-- <hlm-menu-separator />
         <button hlmMenuItem (click)="column.toggleVisibility(false)">
           <ng-icon hlm name="lucideEyeOff" hlmMenuIcon />
           Hide
-        </button>
+        </button> -->
       </hlm-menu>
     </ng-template>
   </ng-template>

@@ -1,31 +1,38 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
-// import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
+import { DataTableColumnHeaderComponent } from '@app/shared/components/data-table/components/data-table-column-header/data-table-column-header.component';
+import { TableCheckboxCellComponent } from '@app/shared/components/data-table/components/table-checkbox-cell/table-checkbox-cell.component';
+import { TableCheckboxHeaderComponent } from '@app/shared/components/data-table/components/table-checkbox-header/table-checkbox-header.component';
+import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideLoader } from '@ng-icons/lucide';
 import { BrnDialogContentDirective } from '@spartan-ng/brain/dialog';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@spartan-ng/brain/forms';
-import { BrnSelectImports } from '@spartan-ng/brain/select';
 import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
 import {
   HlmDialogComponent,
   HlmDialogContentComponent,
-  HlmDialogDescriptionDirective,
   HlmDialogFooterComponent,
   HlmDialogHeaderComponent,
   HlmDialogTitleDirective,
 } from '@spartan-ng/ui-dialog-helm';
 import { HlmFormFieldModule } from '@spartan-ng/ui-formfield-helm';
+import { HlmIconDirective } from '@spartan-ng/ui-icon-helm';
 import { HlmInputDirective } from '@spartan-ng/ui-input-helm';
-import { HlmSelectImports, HlmSelectModule } from '@spartan-ng/ui-select-helm';
+import { ColumnDef } from '@tanstack/angular-table';
 import { toast } from 'ngx-sonner';
 
+import { BadgeDepartmentsComponent } from './components/badge-departments/badge-departments.component';
 import { CountryService } from './countries.service';
 
 @Component({
   standalone: true,
   selector: 'app-countries',
   imports: [
-    // DataTableComponent,
+    CommonModule,
+    DataTableComponent,
     ReactiveFormsModule,
     BrnDialogContentDirective,
     HlmDialogComponent,
@@ -33,76 +40,148 @@ import { CountryService } from './countries.service';
     HlmDialogHeaderComponent,
     HlmDialogFooterComponent,
     HlmDialogTitleDirective,
-    HlmDialogDescriptionDirective,
+    // HlmDialogDescriptionDirective,
     HlmInputDirective,
+    NgIcon,
+    HlmIconDirective,
     HlmFormFieldModule,
-    HlmSelectModule,
     HlmButtonDirective,
-    HlmSelectImports,
-    BrnSelectImports,
   ],
   templateUrl: './countries.component.html',
-  providers: [{ provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher }],
+
+  providers: [
+    provideIcons({ lucideLoader }),
+    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher },
+  ],
 })
 export class CountriesComponent implements OnInit {
   private _formBuilder = inject(FormBuilder);
   private _countryService = inject(CountryService);
 
-  columns = [
-    { key: 'name', label: 'Nombre', width: '50%' },
-    { key: 'code', label: 'Código', width: '30%' },
-  ];
-
   data: any[] = [];
   selectedCountry: any = null;
+  isLoading = true;
+  hasError = false;
+  isDataLoaded = false;
   isModalOpen = false;
   isConfirmationOpen = false;
+  isSubmitting = false;
 
+  // ✅ Formulario de creación/edición de país
   form: FormGroup = this._formBuilder.group({
     name: ['', Validators.required],
     code: ['', [Validators.required, Validators.maxLength(3)]],
   });
 
-  actions = [
-    { label: 'Editar', callback: (row: any) => this.onEditCountry(row) },
-    { label: 'Desactivar', callback: (row: any) => this.onDeactivateCountry(row) },
+  // ✅ Configuración del DataTable con eventos de acción
+  columns: ColumnDef<any>[] = [
+    {
+      id: 'select',
+      header: () => TableCheckboxHeaderComponent,
+      cell: () => TableCheckboxCellComponent,
+      enableSorting: false,
+      enableHiding: false,
+      size: 50,
+      meta: { align: 'center' },
+    },
+    {
+      accessorKey: 'name',
+      header: () => DataTableColumnHeaderComponent,
+      cell: info => `<strong>${info.getValue()}</strong>`,
+      size: 250,
+      meta: { align: 'left' },
+    },
+    {
+      accessorKey: 'code',
+      header: () => DataTableColumnHeaderComponent,
+      size: 150,
+      meta: { align: 'center' },
+    },
+    {
+      accessorKey: 'is_active',
+      header: () => 'Estado',
+      cell: info => `
+        <span
+          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+          ${info.getValue() ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
+        >
+          ${info.getValue() ? 'Activo' : 'Inactivo'}
+        </span>
+      `,
+      size: 100,
+      meta: { align: 'center' },
+    },
+    {
+      accessorKey: 'count_departments',
+      header: () => 'Departamentos',
+      cell: () => BadgeDepartmentsComponent,
+      size: 150,
+      meta: { align: 'center' },
+    },
+    {
+      id: 'actions',
+      header: () => 'Acciones',
+      enableSorting: false,
+      enableHiding: false,
+      size: 40,
+      meta: { align: 'right' },
+    },
   ];
 
   ngOnInit() {
     this.loadCountries();
   }
 
+  /** 📌 Carga inicial de datos */
   loadCountries() {
+    this.isLoading = true;
+    this.hasError = false;
+    this.isDataLoaded = false;
+
     this._countryService.getCountries().subscribe({
-      next: (response: any) => (this.data = response.data ?? []),
-      error: error => toast.error(error.message || 'Hubo un error al cargar los países.'),
+      next: (response: any) => {
+        this.data = response.data ?? [];
+        this.isLoading = false;
+        this.isDataLoaded = true;
+      },
+      error: error => {
+        this.hasError = true;
+        this.isLoading = false;
+        this.isDataLoaded = false;
+        toast.error(error.message || 'Hubo un error al cargar los países.');
+      },
     });
   }
 
-  onEditCountry(country: any) {
+  /** 📌 Abre el modal para crear o editar */
+  openModal(country: any = null) {
     this.selectedCountry = country;
     this.isModalOpen = true;
-    this.form.patchValue(country);
+
+    if (country) {
+      this.form.patchValue(country);
+    } else {
+      this.form.reset({ name: '', code: '' });
+    }
   }
 
-  onDeactivateCountry(country: any) {
+  /** 📌 Abre el diálogo de confirmación para activar/desactivar */
+  openConfirmationDialog(country: any) {
     this.selectedCountry = country;
     this.isConfirmationOpen = true;
   }
 
-  onCreateCountry() {
-    this.selectedCountry = null;
-    this.isModalOpen = true;
-    this.form.reset({ name: '', code: '' });
-  }
-
-  onModalClose() {
+  /** 📌 Cierra los modales */
+  closeModals() {
     this.selectedCountry = null;
     this.isModalOpen = false;
     this.isConfirmationOpen = false;
   }
 
-  onConfirmAction() {
+  /** 📌 Guarda o actualiza un país */
+  saveCountry() {
+    this.isSubmitting = true;
+
     const request = this.selectedCountry
       ? this._countryService.updateCountry(this.selectedCountry.id_country, this.form.value)
       : this._countryService.createCountry(this.form.value);
@@ -115,20 +194,28 @@ export class CountriesComponent implements OnInit {
             : 'País creado con éxito.'
         );
         this.loadCountries();
-        this.onModalClose();
+        this.closeModals();
       },
       error: error => toast.error(error.message || 'Error en la operación.'),
+      complete: () => (this.isSubmitting = false),
     });
   }
 
-  onConfirmDeactivation() {
+  /** 📌 Activa o desactiva un país */
+  toggleCountryStatus() {
+    if (!this.selectedCountry) return;
+
+    this.isSubmitting = true;
+    const action = this.selectedCountry.is_active ? 'desactivar' : 'activar';
+
     this._countryService.deactivateCountry(this.selectedCountry.id_country).subscribe({
       next: () => {
-        toast.success('País desactivado con éxito.');
+        toast.success(`País ${this.selectedCountry.name} ha sido ${action}do.`);
         this.loadCountries();
-        this.onModalClose();
+        this.closeModals();
       },
-      error: error => toast.error(error.message || 'Error al desactivar el país.'),
+      error: error => toast.error(error.message || `Error al ${action} el país.`),
+      complete: () => (this.isSubmitting = false),
     });
   }
 }

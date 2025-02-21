@@ -42,8 +42,8 @@ export class Menu {
           route: '/maintenance/geography',
           children: [
             { label: 'Países', route: '/maintenance/geography/countries' },
-            { label: 'Departamentos', route: '/maintenance/geography/departments' },
-            { label: 'Municipios', route: '/maintenance/geography/municipalities' },
+            // { label: 'Departamentos', route: '/maintenance/geography/departments' },
+            // { label: 'Municipios', route: '/maintenance/geography/municipalities' },
           ],
         },
       ],

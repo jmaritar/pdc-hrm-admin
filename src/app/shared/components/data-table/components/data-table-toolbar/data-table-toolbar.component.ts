@@ -1,29 +1,25 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
-import { HlmInputDirective } from '@spartan-ng/ui-input-helm';
+import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
 import { Table } from '@tanstack/angular-table';
-
-// import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
 
 @Component({
   selector: 'app-data-table-toolbar',
   standalone: true,
-  imports: [HlmInputDirective],
+  imports: [FormsModule, HlmButtonDirective],
   templateUrl: './data-table-toolbar.component.html',
 })
-export class DataTableToolbarComponent<TData> {
+export class DataTableToolbarComponent<TData> implements OnInit {
   @Input() table!: Table<TData>;
+  @Input() filterKey: string = 'firstName';
+  @Output() isOnNew = new EventEmitter<void>();
 
-  constructor() {
-    console.log('Toolbar created', this.table);
+  ngOnInit() {
+    console.log('Toolbar initialized with table:', this.table);
   }
 
-  updateFilter(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    const column = this.table.getColumn('firstName');
-
-    if (column && column.setFilterValue) {
-      column.setFilterValue(value);
-    }
+  handleNew() {
+    this.isOnNew.emit();
   }
 }
