@@ -75,4 +75,46 @@ export class BusinessesService {
         })
       );
   }
+
+  getCompanyTypes(): Observable<any> {
+    return this._http.get(`${environment.API_URL}/companies/type/all`).pipe(
+      catchError(error => {
+        toast.error('Error al obtener los tipos de empresas');
+        return throwError(() => new Error(error));
+      })
+    );
+  }
+
+  getCountries(): Observable<any> {
+    return this._http.get(`${environment.API_URL}/countries/all`).pipe(
+      catchError(error => {
+        toast.error('Error al obtener los países');
+        return throwError(() => new Error(error));
+      })
+    );
+  }
+
+  getDepartmentByIdCountry(countryId: string): Observable<any> {
+    return this._http
+      .post(`${environment.API_URL}/departments/find-by-country`, { country_id: countryId })
+      .pipe(
+        catchError(error => {
+          toast.error('Error al obtener el departamento');
+          return throwError(() => new Error(error));
+        })
+      );
+  }
+
+  getMunicipalityByIdDepartment(departmentId: string): Observable<any> {
+    return this._http
+      .post(`${environment.API_URL}/municipalities/find-by-department`, {
+        department_id: departmentId,
+      })
+      .pipe(
+        catchError(error => {
+          toast.error('Error al obtener el municipio');
+          return throwError(() => new Error(error));
+        })
+      );
+  }
 }

@@ -1,63 +1,173 @@
-<div class="p-6 border-muted/20 bg-background border rounded-xl">
-  <button hlmBtn (click)="onCreateMunicipality()">Agregar Municipalidad</button>
+<div class="p-6 border-muted/20 bg-background border rounded-xl shadow-md">
+  <!-- 📌 Breadcrumb -->
+  <nav hlmBreadcrumb class="mb-4">
+    <ol hlmBreadcrumbList class="flex items-center gap-x-2">
+      <!-- Home -->
+      <li hlmBreadcrumbItem>
+        <a class="inline-flex items-center gap-1" hlmBreadcrumbLink [link]="'/home'">
+          <ng-icon size="sm" hlm name="lucideHouse" />
+          <p>Home</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
 
-  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
+      <!-- Geografía -->
+      <li hlmBreadcrumbItem>
+        <a class="inline-flex items-center gap-1" hlmBreadcrumbLink>
+          <ng-icon size="sm" hlm name="lucideMap" />
+          <p>Geografía</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
 
-  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
-    <hlm-dialog-content *brnDialogContent="let ctx">
-      <hlm-dialog-header class="max-w-xl md:min-w-md">
-        <h3 hlmDialogTitle>
-          {{ selectedMunicipality ? 'Actualizar Municipalidad' : 'Crear Municipalidad' }}
-        </h3>
-        <p hlmDialogDescription>
-          {{
-            selectedMunicipality
-              ? 'Actualice los detalles de la municipalidad.'
-              : 'Complete los detalles para crear una nueva municipalidad.'
-          }}
-        </p>
-      </hlm-dialog-header>
+      <!-- Países -->
+      <li hlmBreadcrumbItem>
+        <a
+          class="inline-flex items-center gap-1"
+          hlmBreadcrumbLink
+          [link]="'/maintenance/geography/countries'"
+        >
+          <ng-icon size="sm" hlm name="lucideEarth" />
+          <p>Países</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
 
-      <form [formGroup]="form" class="space-y-6">
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Nombre de la municipalidad
-            <input
-              aria-label="Nombre"
-              formControlName="name"
-              autocomplete="off"
-              class="mt-1.5 w-full"
-              hlmInput
-              type="text"
-              placeholder="Nombre"
-            />
-          </label>
-          <hlm-error>El nombre es requerido</hlm-error>
-        </hlm-form-field>
+      <!-- Departamentos (Ruta dinámica con `departmentId` y `departmentName`) -->
+      <li hlmBreadcrumbItem>
+        <a
+          class="inline-flex items-center gap-1"
+          hlmBreadcrumbLink
+          [link]="'/maintenance/geography/countries/departments/' + departmentId"
+          [queryParams]="{ name: departmentName }"
+        >
+          <ng-icon size="sm" hlm name="lucideBuilding" />
+          <p>Departamentos</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
 
-        <hlm-form-field class="flex w-full flex-col">
-          <label class="block" hlmLabel for="department-select">Departamento</label>
-          <brn-select id="department-select" class="inline-block" formControlName="department_id">
-            <hlm-select-trigger class="w-full">
-              {{ selectedDepartmentLabel }}
-            </hlm-select-trigger>
-            <hlm-select-content>
-              <hlm-select-label>Selecciona un departamento</hlm-select-label>
-              @for (department of departments; track department.id) {
-                <hlm-option [value]="department.id">{{ department.name }}</hlm-option>
-              }
-            </hlm-select-content>
-          </brn-select>
-          <hlm-error>El departamento es requerido</hlm-error>
-        </hlm-form-field>
-      </form>
+      <!-- Gestión de Municipalidades -->
+      <li hlmBreadcrumbItem>
+        <span hlmBreadcrumbPage>Municipalidades - {{ departmentName }}</span>
+      </li>
+    </ol>
+  </nav>
 
-      <hlm-dialog-footer>
-        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
-        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
-          {{ selectedMunicipality ? 'Actualizar' : 'Crear' }}
-        </button>
-      </hlm-dialog-footer>
-    </hlm-dialog-content>
-  </hlm-dialog>
+  @if (isLoading) {
+    <div class="flex flex-col justify-center items-center p-10 text-muted-foreground gap-2">
+      <span class="text-lg font-medium">Cargando municipalidades...</span>
+      <ng-icon size="sm" hlm size="xl" name="lucideLoader" class="animate-spin" />
+    </div>
+  }
+
+  @if (hasError) {
+    <div class="flex flex-col items-center justify-center p-10 text-center">
+      <p class="text-destructive mb-4 text-lg font-medium">
+        Hubo un error al cargar las municipalidades.
+      </p>
+      <button hlmBtn variant="outline" (click)="loadMunicipalities()">Reintentar</button>
+    </div>
+  }
+
+  @if (!isLoading && isDataLoaded) {
+    <app-data-table
+      [data]="data"
+      [columns]="columns"
+      [filterKey]="'name'"
+      [showEdit]="true"
+      [showDisable]="true"
+      (isOnNew)="openModal()"
+      (editRow)="openModal($event)"
+      (disableRow)="openConfirmationDialog($event)"
+    />
+  }
 </div>
+
+<!-- ✅ Diálogo para Crear/Editar Municipalidad -->
+<hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content
+    *brnDialogContent="let ctx"
+    class="min-w-[98svw] md:min-w-lg p-6 bg-white rounded-lg"
+  >
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle class="text-lg font-semibold text-gray-800">
+        {{ selectedMunicipality ? 'Actualizar Municipalidad' : 'Crear Municipalidad' }}
+      </h3>
+    </hlm-dialog-header>
+
+    <form [formGroup]="form" class="space-y-4">
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Nombre de la municipalidad
+          <input formControlName="name" hlmInput class="mt-1 w-full" placeholder="Ej. Mixco" />
+        </label>
+      </hlm-form-field>
+    </form>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        class="bg-blue-600 text-white hover:bg-blue-700"
+        [disabled]="form.invalid || isSubmitting"
+        (click)="saveMunicipality()"
+      >
+        <ng-container *ngIf="isSubmitting; else normalText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #normalText>
+          {{ selectedMunicipality ? 'Actualizar' : 'Guardar' }}
+        </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>
+
+<!-- ✅ Diálogo de Confirmación para Activar/Desactivar Municipalidad -->
+<hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content *brnDialogContent="let ctx" class="max-w-lg mx-auto p-6 bg-white rounded-lg">
+    <hlm-dialog-header>
+      <h3
+        hlmDialogTitle
+        class="text-lg font-semibold"
+        [ngClass]="{
+          'text-red-600': selectedMunicipality?.is_active,
+          'text-green-600': !selectedMunicipality?.is_active,
+        }"
+      >
+        {{ selectedMunicipality?.is_active ? 'Confirmar Desactivación' : 'Confirmar Activación' }}
+      </h3>
+    </hlm-dialog-header>
+
+    <p class="text-gray-700 text-sm">
+      ¿Estás seguro de que deseas
+      <span class="font-semibold">
+        {{ selectedMunicipality?.is_active ? 'desactivar' : 'activar' }} a
+        {{ selectedMunicipality?.name }} </span
+      >? Esta acción no se puede deshacer.
+    </p>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        [ngClass]="{
+          'bg-red-600 hover:bg-red-700': selectedMunicipality?.is_active,
+          'bg-green-600 hover:bg-green-700': !selectedMunicipality?.is_active,
+        }"
+        [disabled]="isSubmitting"
+        (click)="toggleMunicipalityStatus()"
+      >
+        <ng-container *ngIf="isSubmitting; else statusText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #statusText>
+          {{ selectedMunicipality?.is_active ? 'Desactivar' : 'Activar' }}
+        </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>

@@ -14,10 +14,11 @@ import { environment } from '@env/environment';
 export class UserService {
   private _http = inject(HttpClient);
   private _storage = inject(StorageService);
+  private API_URL = `${environment.API_URL}/users`;
 
   // Obtener todos los usuarios
   getUsers(): Observable<unknown> {
-    return this._http.get(`${environment.API_URL}/users/all`).pipe(
+    return this._http.get(`${this.API_URL}/all`).pipe(
       catchError(error => {
         toast.error('Error al obtener los usuarios');
         return throwError(() => new Error(error));
@@ -25,9 +26,19 @@ export class UserService {
     );
   }
 
+  // Obtener usuario por ID
+  getUserById(userId: string): Observable<any> {
+    return this._http.post(`${this.API_URL}/find-user`, { user_id: userId }).pipe(
+      catchError(error => {
+        toast.error('Error al obtener el usuario');
+        return throwError(() => new Error(error));
+      })
+    );
+  }
+
   // Crear un nuevo usuario
   createUser(userData: any): Observable<any> {
-    return this._http.post(`${environment.API_URL}/users`, userData).pipe(
+    return this._http.post(`${this.API_URL}`, userData).pipe(
       catchError(error => {
         toast.error('Error al crear el usuario');
         return throwError(() => new Error(error));
@@ -38,7 +49,7 @@ export class UserService {
   // Actualizar un usuario existente
   updateUser(userId: string, userData: any): Observable<any> {
     return this._http
-      .put(`${environment.API_URL}/users`, {
+      .put(`${this.API_URL}`, {
         user_id: userId,
         data: userData,
       })
@@ -50,17 +61,27 @@ export class UserService {
       );
   }
 
-  // Desactivar un usuario (soft delete)
-  deactivateUser(userId: string): Observable<any> {
+  // Activar o desactivar un usuario
+  toggleUserStatus(userId: string): Observable<any> {
     return this._http
-      .post(`${environment.API_URL}/users/deactivate`, {
+      .post(`${this.API_URL}/toggle-status`, {
         user_id: userId,
       })
       .pipe(
         catchError(error => {
-          toast.error('Error al desactivar el usuario');
+          toast.error('Error al actualizar el estado del usuario');
           return throwError(() => new Error(error));
         })
       );
+  }
+
+  // Eliminar un usuario
+  deleteUser(userId: string): Observable<any> {
+    return this._http.delete(`${this.API_URL}`, { body: { user_id: userId } }).pipe(
+      catchError(error => {
+        toast.error('Error al eliminar el usuario');
+        return throwError(() => new Error(error));
+      })
+    );
   }
 }

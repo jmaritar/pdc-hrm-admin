@@ -24,7 +24,8 @@ const routes: Routes = [
       },
       {
         path: 'user',
-        loadComponent: () => import('../pages/user/user.component').then(m => m.UserComponent),
+        loadComponent: () =>
+          import('../pages/user/users-routing.module').then(m => m.UserRoutingModule),
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],

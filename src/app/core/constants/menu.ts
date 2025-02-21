@@ -57,16 +57,6 @@ export class Menu {
           label: 'Registros de Auditoría',
           route: '/management/audit-logs',
         },
-        {
-          icon: 'assets/icons/heroicons/outline/chart-bar.svg',
-          label: 'Reportes',
-          route: '/management/reports',
-        },
-        {
-          icon: 'assets/icons/heroicons/outline/chart-bar.svg',
-          label: 'Data Table',
-          route: '/management/data-table-use',
-        },
       ],
     },
     {

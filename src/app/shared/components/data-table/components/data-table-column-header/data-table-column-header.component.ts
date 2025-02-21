@@ -25,6 +25,10 @@ const columnNames: Record<string, string> = {
   visits: 'Visitas',
   status: 'Estado',
   progress: 'Progreso',
+  name: 'Nombre',
+  trade_name: 'Nombre comercial',
+  legal_name: 'Nombre legal',
+  email: 'Correo electrónico',
 };
 
 @Component({

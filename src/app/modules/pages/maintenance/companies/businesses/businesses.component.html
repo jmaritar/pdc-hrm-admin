@@ -1,96 +1,225 @@
-<div class="p-6 border-muted/20 bg-background border rounded-xl over">
-  <button hlmBtn (click)="onCreateCompany()">Agregar Compañía</button>
+<div class="p-6 border-muted/20 bg-background border rounded-xl shadow-md">
+  <h2 class="text-lg font-semibold mb-4">Gestión de Empresas</h2>
 
-  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
+  @if (isLoading) {
+    <div class="flex flex-col justify-center items-center p-10 text-muted-foreground gap-2">
+      <span class="text-lg font-medium">Cargando empresas...</span>
+      <ng-icon size="sm" hlm size="xl" name="lucideLoader" class="animate-spin" />
+    </div>
+  }
 
-  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
-    <hlm-dialog-content *brnDialogContent="let ctx">
-      <hlm-dialog-header class="max-w-xl md:min-w-md">
-        <h3 hlmDialogTitle>{{ selectedCompany ? 'Actualizar Compañía' : 'Crear Compañía' }}</h3>
-        <p hlmDialogDescription>
-          {{
-            selectedCompany
-              ? 'Actualiza los datos de la compañía'
-              : 'Ingresa los datos de la nueva compañía'
-          }}
-        </p>
-      </hlm-dialog-header>
+  @if (hasError) {
+    <div class="flex flex-col items-center justify-center p-10 text-center">
+      <p class="text-destructive mb-4 text-lg font-medium">Hubo un error al cargar las empresas.</p>
+      <button hlmBtn variant="outline" (click)="loadCompanies()">Reintentar</button>
+    </div>
+  }
 
-      <form [formGroup]="form" class="space-y-6">
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Nombre de la Compañía
-            <input
-              aria-label="Nombre"
-              formControlName="name"
-              autocomplete="off"
-              class="mt-1.5 w-full"
-              hlmInput
-              type="text"
-              placeholder="Nombre"
-            />
-          </label>
-
-          <hlm-error>El nombre es requerido</hlm-error>
-        </hlm-form-field>
-
-        <hlm-form-field>
-          <label class="block" hlmLabel for="companyType"> Tipo de Empresa </label>
-          <brn-select formControlName="type" id="companyType">
-            <hlm-select-trigger class="w-full">
-              {{ companyTypeLabel }}
-            </hlm-select-trigger>
-            <hlm-select-content>
-              <hlm-select-label>Selecciona un tipo de empresa</hlm-select-label>
-              <hlm-option *ngFor="let type of companyTypes" [value]="type.value">
-                {{ type.label }}
-              </hlm-option>
-            </hlm-select-content>
-          </brn-select>
-
-          <hlm-error>El tipo de empresa es requerido</hlm-error>
-        </hlm-form-field>
-
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Descripción
-            <input
-              aria-label="Descripción"
-              formControlName="description"
-              autocomplete="off"
-              class="mt-1.5 w-full"
-              hlmInput
-              type="text"
-              placeholder="Descripción"
-            />
-          </label>
-
-          <hlm-error>La descripción es requerida</hlm-error>
-        </hlm-form-field>
-      </form>
-
-      <hlm-dialog-footer>
-        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
-        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
-          {{ selectedCompany ? 'Actualizar' : 'Crear' }}
-        </button>
-      </hlm-dialog-footer>
-    </hlm-dialog-content>
-  </hlm-dialog>
-
-  <hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="onModalClose()">
-    <hlm-dialog-content *brnDialogContent="let ctx">
-      <hlm-dialog-header class="max-w-md">
-        <h3 hlmDialogTitle>Confirmar Eliminación</h3>
-        <p hlmDialogDescription>
-          ¿Estás seguro de que deseas eliminar la compañía {{ selectedCompany?.name }}?
-        </p>
-      </hlm-dialog-header>
-
-      <hlm-dialog-footer>
-        <button hlmBtn variant="default" (click)="onModalClose()">Cancelar</button>
-        <button hlmBtn variant="destructive" (click)="onConfirmDeletion()">Eliminar</button>
-      </hlm-dialog-footer>
-    </hlm-dialog-content>
-  </hlm-dialog>
+  @if (!isLoading && isDataLoaded) {
+    <app-data-table
+      [data]="data"
+      [columns]="columns"
+      [filterKey]="'trade_name'"
+      [showEdit]="true"
+      [showDisable]="true"
+      (isOnNew)="openModal()"
+      (editRow)="openModal($event)"
+      (disableRow)="openConfirmationDialog($event)"
+    />
+  }
 </div>
+
+<!-- ✅ Diálogo para Crear/Editar Empresa -->
+<hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content
+    *brnDialogContent="let ctx"
+    class="min-w-[98svw] md:min-w-lg p-6 bg-white rounded-lg"
+  >
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle class="text-lg font-semibold text-gray-800">
+        {{ selectedBusiness ? 'Actualizar Empresa' : 'Crear Empresa' }}
+      </h3>
+    </hlm-dialog-header>
+
+    <form [formGroup]="form" class="space-y-4">
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Razón Social
+          <input
+            formControlName="legal_name"
+            hlmInput
+            class="mt-1 w-full"
+            placeholder="Ej. Tech Solutions S.A."
+          />
+        </label>
+      </hlm-form-field>
+
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Nombre Comercial
+          <input
+            formControlName="trade_name"
+            hlmInput
+            class="mt-1 w-full"
+            placeholder="Ej. Tech Solutions"
+          />
+        </label>
+      </hlm-form-field>
+
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          NIT
+          <input formControlName="nit" hlmInput class="mt-1 w-full" placeholder="Ej. 12345678-9" />
+        </label>
+      </hlm-form-field>
+
+      <div class="grid grid-cols-2 gap-4">
+        <hlm-form-field>
+          <label hlmLabel class="block text-sm font-medium text-gray-700">
+            Teléfono
+            <input
+              formControlName="phone"
+              hlmInput
+              class="mt-1 w-full"
+              placeholder="Ej. +502 1234-5678"
+            />
+          </label>
+        </hlm-form-field>
+
+        <hlm-form-field>
+          <label hlmLabel class="block text-sm font-medium text-gray-700">
+            Correo Electrónico
+            <input
+              formControlName="email"
+              hlmInput
+              class="mt-1 w-full"
+              placeholder="Ej. contacto@empresa.com"
+            />
+          </label>
+        </hlm-form-field>
+      </div>
+
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Dirección
+          <input
+            formControlName="address"
+            hlmInput
+            class="mt-1 w-full"
+            placeholder="Ej. Avenida Reforma, Zona 10"
+          />
+        </label>
+      </hlm-form-field>
+
+      <div class="grid grid-cols-2 gap-4">
+        <hlm-form-field>
+          <label hlmLabel class="block text-sm font-medium text-gray-700">
+            Tipo de Empresa
+            <select formControlName="company_type_id" hlmInput class="mt-1 w-full">
+              <option *ngFor="let type of companyTypes" [value]="type.id_company_type">
+                {{ type.name }}
+              </option>
+            </select>
+          </label>
+        </hlm-form-field>
+
+        <hlm-form-field>
+          <label hlmLabel class="block text-sm font-medium text-gray-700">
+            País
+            <select
+              formControlName="country_id"
+              hlmInput
+              class="mt-1 w-full"
+              (change)="onCountryChange()"
+            >
+              <option *ngFor="let country of countries" [value]="country.id_country">
+                {{ country.name }}
+              </option>
+            </select>
+          </label>
+        </hlm-form-field>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <hlm-form-field>
+          <label hlmLabel class="block text-sm font-medium text-gray-700">
+            Departamento
+            <select
+              formControlName="department_id"
+              hlmInput
+              class="mt-1 w-full"
+              (change)="onDepartmentChange()"
+            >
+              <option *ngFor="let department of departments" [value]="department.id_department">
+                {{ department.name }}
+              </option>
+            </select>
+          </label>
+        </hlm-form-field>
+
+        <hlm-form-field>
+          <label hlmLabel class="block text-sm font-medium text-gray-700">
+            Municipio
+            <select formControlName="municipality_id" hlmInput class="mt-1 w-full">
+              <option
+                *ngFor="let municipality of municipalities"
+                [value]="municipality.id_municipality"
+              >
+                {{ municipality.name }}
+              </option>
+            </select>
+          </label>
+        </hlm-form-field>
+      </div>
+    </form>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        class="bg-blue-600 text-white hover:bg-blue-700"
+        [disabled]="form.invalid || isSubmitting"
+        (click)="saveBusiness()"
+      >
+        <ng-container *ngIf="isSubmitting; else normalText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #normalText>
+          {{ selectedBusiness ? 'Actualizar' : 'Guardar' }}
+        </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>
+
+<!-- ✅ Diálogo de Confirmación para Desactivar Empresa -->
+<hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content *brnDialogContent="let ctx" class="max-w-lg mx-auto p-6 bg-white rounded-lg">
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle class="text-lg font-semibold text-red-600">Confirmar Desactivación</h3>
+    </hlm-dialog-header>
+
+    <p class="text-gray-700 text-sm">
+      ¿Estás seguro de que deseas desactivar la empresa
+      <span class="font-semibold">{{ selectedBusiness?.trade_name }}</span
+      >? Puedes activarla de nuevo en el futuro.
+    </p>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        class="bg-red-600 text-white hover:bg-red-700"
+        [disabled]="isSubmitting"
+        (click)="deactivateBusiness()"
+      >
+        <ng-container *ngIf="isSubmitting; else deactivateText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Desactivando...
+        </ng-container>
+        <ng-template #deactivateText>Desactivar</ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>

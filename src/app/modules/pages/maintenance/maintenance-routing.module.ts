@@ -10,6 +10,14 @@ const routes: Routes = [
     loadComponent: () => import('./users/users.component').then(m => m.UsersComponent),
   },
   {
+    path: 'users/companies/:id_user',
+    canActivate: [hasRoleGuard(['SUPER_ADMIN'])],
+    loadComponent: () =>
+      import('./users/users-companies/users-companies.component').then(
+        m => m.UsersCompaniesComponent
+      ),
+  },
+  {
     path: 'collaborators',
     canActivate: [hasRoleGuard(['SUPER_ADMIN'])],
     loadComponent: () =>

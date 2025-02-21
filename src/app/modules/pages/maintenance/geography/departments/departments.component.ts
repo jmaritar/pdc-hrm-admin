@@ -13,7 +13,6 @@ import { BrnDialogContentDirective } from '@spartan-ng/brain/dialog';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@spartan-ng/brain/forms';
 import {
   HlmBreadcrumbDirective,
-  HlmBreadcrumbEllipsisComponent,
   HlmBreadcrumbItemDirective,
   HlmBreadcrumbLinkDirective,
   HlmBreadcrumbListDirective,
@@ -29,6 +28,7 @@ import {
   HlmDialogTitleDirective,
 } from '@spartan-ng/ui-dialog-helm';
 import { HlmFormFieldModule } from '@spartan-ng/ui-formfield-helm';
+import { HlmIconDirective } from '@spartan-ng/ui-icon-helm';
 import { HlmInputDirective } from '@spartan-ng/ui-input-helm';
 import { ColumnDef } from '@tanstack/angular-table';
 import { toast } from 'ngx-sonner';
@@ -53,13 +53,14 @@ import { DepartmentService } from './departments.service';
     HlmFormFieldModule,
     HlmButtonDirective,
     HlmBreadcrumbDirective,
-    HlmBreadcrumbEllipsisComponent,
     HlmBreadcrumbItemDirective,
     HlmBreadcrumbLinkDirective,
     HlmBreadcrumbListDirective,
     HlmBreadcrumbPageDirective,
     HlmBreadcrumbSeparatorComponent,
+
     NgIcon,
+    HlmIconDirective,
   ],
   templateUrl: './departments.component.html',
   providers: [

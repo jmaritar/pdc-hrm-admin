@@ -19,7 +19,7 @@ import {
   lucideEllipsis,
   lucidePencil,
   lucideSquarePen,
-  lucideTrash,
+  lucideTrash2,
 } from '@ng-icons/lucide';
 import { BrnMenuTriggerDirective } from '@spartan-ng/brain/menu';
 import { BrnTableModule } from '@spartan-ng/brain/table';
@@ -64,7 +64,7 @@ import { DataTableToolbarComponent } from './components/data-table-toolbar/data-
       lucideArrowUpDown,
       lucideEllipsis,
       lucidePencil,
-      lucideTrash,
+      lucideTrash2,
       lucideBan,
       lucideCloudOff,
       lucideSquarePen,

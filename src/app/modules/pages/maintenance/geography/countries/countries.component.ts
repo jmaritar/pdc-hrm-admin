@@ -12,11 +12,9 @@ import { BrnDialogContentDirective } from '@spartan-ng/brain/dialog';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@spartan-ng/brain/forms';
 import {
   HlmBreadcrumbDirective,
-  HlmBreadcrumbEllipsisComponent,
   HlmBreadcrumbItemDirective,
   HlmBreadcrumbLinkDirective,
   HlmBreadcrumbListDirective,
-  HlmBreadcrumbPageDirective,
   HlmBreadcrumbSeparatorComponent,
 } from '@spartan-ng/ui-breadcrumb-helm';
 import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
@@ -56,11 +54,9 @@ import { CountryService } from './countries.service';
     HlmFormFieldModule,
     HlmButtonDirective,
     HlmBreadcrumbDirective,
-    HlmBreadcrumbEllipsisComponent,
     HlmBreadcrumbItemDirective,
     HlmBreadcrumbLinkDirective,
     HlmBreadcrumbListDirective,
-    HlmBreadcrumbPageDirective,
     HlmBreadcrumbSeparatorComponent,
   ],
   templateUrl: './countries.component.html',

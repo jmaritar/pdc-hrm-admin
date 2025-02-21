@@ -1,124 +1,140 @@
-<div class="p-6 border-muted/20 bg-background border rounded-xl over">
-  <button hlmBtn (click)="onCreateUser()">Agregar Usuario</button>
+<div class="p-6 border-muted/20 bg-background border rounded-xl shadow-md">
+  <h2 class="text-lg font-semibold mb-4">Gestión de Usuarios</h2>
 
-  <!-- <app-data-table [columns]="columns" [data]="data" [actions]="actions"></app-data-table> -->
+  @if (isLoading) {
+    <div class="flex flex-col justify-center items-center p-10 text-muted-foreground gap-2">
+      <span class="text-lg font-medium">Cargando usuarios...</span>
+      <ng-icon size="sm" hlm size="xl" name="lucideLoader" class="animate-spin" />
+    </div>
+  }
 
-  <hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="onModalClose()">
-    <hlm-dialog-content *brnDialogContent="let ctx">
-      <hlm-dialog-header class="max-w-xl md:min-w-md">
-        <h3 hlmDialogTitle>{{ selectedUser ? 'Actualizar Usuario' : 'Crear Usuario' }}</h3>
-        <p hlmDialogDescription>
-          {{
-            selectedUser
-              ? 'Actualice los detalles del usuario.'
-              : 'Complete los detalles para crear un nuevo usuario.'
-          }}
-        </p>
-      </hlm-dialog-header>
+  @if (hasError) {
+    <div class="flex flex-col items-center justify-center p-10 text-center">
+      <p class="text-destructive mb-4 text-lg font-medium">Hubo un error al cargar los usuarios.</p>
+      <button hlmBtn variant="outline" (click)="loadUsers()">Reintentar</button>
+    </div>
+  }
 
-      <form [formGroup]="form" class="space-y-6">
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Nombre del usuario
-            <input
-              aria-label="Nombre"
-              formControlName="name"
-              autocomplete="off"
-              class="mt-1.5 w-full"
-              hlmInput
-              type="text"
-              placeholder="Nombre"
-            />
-          </label>
-
-          <hlm-error>El nombre es requerido</hlm-error>
-        </hlm-form-field>
-
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Correo electrónico
-
-            <input
-              aria-label="Correo"
-              formControlName="email"
-              class="mt-1.5 w-full"
-              hlmInput
-              autocomplete="off"
-              type="email"
-              placeholder="Correo electrónico"
-              [disabled]="selectedUser !== null"
-            />
-          </label>
-          <hlm-error>El correo es requerido {{ selectedUser }}</hlm-error>
-        </hlm-form-field>
-
-        <hlm-form-field>
-          <label class="block" hlmLabel>
-            Contraseña
-            <input
-              aria-label="Contraseña"
-              formControlName="password"
-              class="w-full"
-              hlmInput
-              autocomplete="off"
-              type="password"
-              placeholder="Contraseña"
-            />
-          </label>
-          <hlm-error>La contraseña es requerida</hlm-error>
-        </hlm-form-field>
-
-        <hlm-form-field class="flex w-full flex-col">
-          <label class="block" hlmLabel for="role-select">Rol </label>
-          <brn-select id="role-select" class="inline-block" formControlName="role">
-            <hlm-select-trigger class="w-full">
-              <!-- <hlm-select-value> -->
-              {{ selectedRoleLabel }}
-
-              <!-- </hlm-select-value> -->
-            </hlm-select-trigger>
-            <hlm-select-content>
-              <hlm-select-label>Selecciona un rol</hlm-select-label>
-              @for (role of roles; track role.value) {
-                <hlm-option [value]="role.value">{{ role.label }}</hlm-option>
-              }
-            </hlm-select-content>
-          </brn-select>
-          <hlm-error>El rol es requerido</hlm-error>
-        </hlm-form-field>
-      </form>
-
-      <hlm-dialog-footer>
-        <button hlmBtn variant="destructive" (click)="onModalClose()">Cancelar</button>
-        <button hlmBtn variant="default" [disabled]="form.invalid" (click)="onConfirmAction()">
-          {{ selectedUser ? 'Actualizar' : 'Crear' }}
-        </button>
-      </hlm-dialog-footer>
-    </hlm-dialog-content>
-  </hlm-dialog>
-
-  <hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="onModalClose()">
-    <hlm-dialog-content *brnDialogContent="let ctx">
-      <hlm-dialog-header class="max-w-md">
-        <h3 hlmDialogTitle>
-          {{ selectedUser?.is_active ? 'Confirmar Desactivación' : 'Confirmar Activación' }}
-        </h3>
-        <p hlmDialogDescription>
-          ¿Estás seguro de que deseas
-          {{ selectedUser?.is_active ? 'desactivar' : 'activar' }} a {{ selectedUser?.name }}?
-        </p>
-      </hlm-dialog-header>
-
-      <hlm-dialog-footer>
-        <button hlmBtn variant="default" (click)="onModalClose()">Cancelar</button>
-        <button
-          hlmBtn
-          [variant]="selectedUser?.is_active ? 'destructive' : 'secondary'"
-          (click)="onConfirmDeactivation()"
-        >
-          {{ selectedUser?.is_active ? 'Desactivar' : 'Activar' }}
-        </button>
-      </hlm-dialog-footer>
-    </hlm-dialog-content>
-  </hlm-dialog>
+  @if (!isLoading && isDataLoaded) {
+    <app-data-table
+      [data]="data"
+      [columns]="columns"
+      [filterKey]="'name'"
+      [showEdit]="true"
+      [showDisable]="true"
+      (isOnNew)="openModal()"
+      (editRow)="openModal($event)"
+      (disableRow)="toggleUserStatus($event)"
+      (deleteRow)="openConfirmationDialog($event)"
+    />
+  }
 </div>
+
+<!-- ✅ Diálogo para Crear/Editar Usuario -->
+<hlm-dialog [state]="isModalOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content
+    *brnDialogContent="let ctx"
+    class="min-w-[98svw] md:min-w-lg p-6 bg-white rounded-lg"
+  >
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle class="text-lg font-semibold text-gray-800">
+        {{ selectedUser ? 'Actualizar Usuario' : 'Crear Usuario' }}
+      </h3>
+    </hlm-dialog-header>
+
+    <form [formGroup]="form" class="space-y-4">
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Nombre Completo
+          <input formControlName="name" hlmInput class="mt-1 w-full" placeholder="Ej. Juan Pérez" />
+        </label>
+      </hlm-form-field>
+
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Correo Electrónico
+          <input
+            formControlName="email"
+            hlmInput
+            class="mt-1 w-full"
+            placeholder="Ej. usuario@email.com"
+            [disabled]="selectedUser !== null"
+          />
+        </label>
+      </hlm-form-field>
+
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Contraseña
+          <input
+            formControlName="password"
+            type="password"
+            hlmInput
+            class="mt-1 w-full"
+            placeholder="******"
+          />
+        </label>
+      </hlm-form-field>
+
+      <hlm-form-field>
+        <label hlmLabel class="block text-sm font-medium text-gray-700">
+          Rol de Usuario
+          <select formControlName="role" hlmInput class="mt-1 w-full">
+            <option *ngFor="let role of roles" [value]="role">
+              {{ role }}
+            </option>
+          </select>
+        </label>
+      </hlm-form-field>
+    </form>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        class="bg-blue-600 text-white hover:bg-blue-700"
+        [disabled]="form.invalid || isSubmitting"
+        (click)="saveUser()"
+      >
+        <ng-container *ngIf="isSubmitting; else normalText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Procesando...
+        </ng-container>
+        <ng-template #normalText>
+          {{ selectedUser ? 'Actualizar' : 'Guardar' }}
+        </ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>
+
+<!-- ✅ Diálogo de Confirmación para Eliminar Usuario -->
+<hlm-dialog [state]="isConfirmationOpen ? 'open' : 'closed'" (closed)="closeModals()">
+  <hlm-dialog-content *brnDialogContent="let ctx" class="max-w-lg mx-auto p-6 bg-white rounded-lg">
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle class="text-lg font-semibold text-red-600">Confirmar Eliminación</h3>
+    </hlm-dialog-header>
+
+    <p class="text-gray-700 text-sm">
+      ¿Estás seguro de que deseas eliminar el usuario
+      <span class="font-semibold">{{ selectedUser?.name }}</span
+      >? Esta acción no se puede deshacer.
+    </p>
+
+    <hlm-dialog-footer class="flex justify-end gap-2 mt-4">
+      <button hlmBtn variant="outline" (click)="closeModals()">Cancelar</button>
+      <button
+        hlmBtn
+        class="bg-red-600 text-white hover:bg-red-700"
+        [disabled]="isSubmitting"
+        (click)="deleteUser()"
+      >
+        <ng-container *ngIf="isSubmitting; else deleteText">
+          <ng-icon name="lucideLoader" class="animate-spin mr-1" />
+          Eliminando...
+        </ng-container>
+        <ng-template #deleteText>Eliminar</ng-template>
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>
