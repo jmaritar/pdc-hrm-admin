@@ -97,6 +97,9 @@
       ],
       "@spartan-ng/ui-avatar-helm": [
         ".\\libs/ui/ui-avatar-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-breadcrumb-helm": [
+        ".\\libs/ui/ui-breadcrumb-helm/src/index.ts"
       ]
     }
   },

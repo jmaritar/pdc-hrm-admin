@@ -42,7 +42,7 @@ const routes: Routes = [
       import('./geography/departments/departments.component').then(m => m.DepartmentsComponent),
   },
   {
-    path: 'geography/countries/departments/municipalities',
+    path: 'geography/countries/departments/municipalities/:id_department',
     canActivate: [hasRoleGuard(['SUPER_ADMIN', 'ADMIN'])],
     loadComponent: () =>
       import('./geography/municipalities/municipalities.component').then(

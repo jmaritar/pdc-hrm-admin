@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -15,7 +16,7 @@ interface Country {
 @Component({
   selector: 'app-badge-departments',
   standalone: true,
-  imports: [HlmIconDirective, NgIcon],
+  imports: [CommonModule, HlmIconDirective, NgIcon],
   providers: [
     provideIcons({
       lucideEarth,
@@ -25,14 +26,17 @@ interface Country {
     <div class="relative inline-block">
       <!-- Círculo rojo con el número de departamentos -->
       <span
-        class="absolute z-0 -top-2 -right-2 flex items-center justify-center size-5 bg-red-500 text-white text-xs font-bold rounded-full shadow-md"
+        *ngIf="row.original.count_departments > 0"
+        class="absolute z-0 -top-2 -right-2 flex items-center justify-center size-5
+               bg-red-500 text-white text-xs font-bold rounded-full shadow-md"
       >
-        {{ row.original?.count_departments }}
+        {{ row.original.count_departments }}
       </span>
 
       <!-- Botón azul con ícono Earth 🌍 -->
       <button
-        class="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-700 transition"
+        class="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded-lg
+               shadow-lg hover:bg-blue-700 transition"
         (click)="navigateToDepartments()"
       >
         <ng-icon hlm size="sm" name="lucideEarth" />
@@ -49,7 +53,8 @@ export class BadgeDepartmentsComponent {
 
     const countryData: Country = this.row.original;
 
-    // Redirigimos con el Router de Angular (SIN recargar la página)
-    this.router.navigate(['/maintenance/geography/countries/departments', countryData.id_country]);
+    this.router.navigate(['/maintenance/geography/countries/departments', countryData.id_country], {
+      queryParams: { name: countryData.name },
+    });
   }
 }

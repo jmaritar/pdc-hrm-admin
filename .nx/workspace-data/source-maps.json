@@ -24,6 +24,22 @@
       "angular.json",
       "nx-angular-json-plugin"
     ],
+    "generators.@schematics/angular:component": [
+      "angular.json",
+      "nx-angular-json-plugin"
+    ],
+    "generators.@schematics/angular:component.style": [
+      "angular.json",
+      "nx-angular-json-plugin"
+    ],
+    "generators.@schematics/angular:application": [
+      "angular.json",
+      "nx-angular-json-plugin"
+    ],
+    "generators.@schematics/angular:application.strict": [
+      "angular.json",
+      "nx-angular-json-plugin"
+    ],
     "targets": [
       "angular.json",
       "nx-angular-json-plugin"
@@ -65,6 +81,10 @@
       "nx-angular-json-plugin"
     ],
     "targets.build.options.tsConfig": [
+      "angular.json",
+      "nx-angular-json-plugin"
+    ],
+    "targets.build.options.inlineStyleLanguage": [
       "angular.json",
       "nx-angular-json-plugin"
     ],
@@ -169,6 +189,10 @@
       "nx-angular-json-plugin"
     ],
     "targets.test.options.tsConfig": [
+      "angular.json",
+      "nx-angular-json-plugin"
+    ],
+    "targets.test.options.inlineStyleLanguage": [
       "angular.json",
       "nx-angular-json-plugin"
     ],

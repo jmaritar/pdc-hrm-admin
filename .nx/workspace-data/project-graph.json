@@ -9,7 +9,14 @@
         "sourceRoot": "src",
         "prefix": "app",
         "name": "pdc-hrm-admin",
-        "generators": {},
+        "generators": {
+          "@schematics/angular:component": {
+            "style": "css"
+          },
+          "@schematics/angular:application": {
+            "strict": true
+          }
+        },
         "targets": {
           "build": {
             "executor": "@angular-devkit/build-angular:application",
@@ -21,6 +28,7 @@
                 "zone.js"
               ],
               "tsConfig": "tsconfig.app.json",
+              "inlineStyleLanguage": "css",
               "assets": [
                 "src/favicon.ico",
                 "src/assets",
@@ -93,6 +101,7 @@
                 "zone.js/testing"
               ],
               "tsConfig": "tsconfig.spec.json",
+              "inlineStyleLanguage": "css",
               "assets": [
                 "src/favicon.ico",
                 "src/assets",
@@ -3934,6 +3943,51 @@
         "hash": "11173686741024659553"
       }
     },
+    "npm:@svgdotjs/svg.draggable.js": {
+      "type": "npm",
+      "name": "npm:@svgdotjs/svg.draggable.js",
+      "data": {
+        "version": "3.0.6",
+        "packageName": "@svgdotjs/svg.draggable.js",
+        "hash": "sha512-7iJFm9lL3C40HQcqzEfezK2l+dW2CpoVY3b77KQGqc8GXWa6LhhmX5Ckv7alQfUXBuZbjpICZ+Dvq1czlGx7gA=="
+      }
+    },
+    "npm:@svgdotjs/svg.filter.js": {
+      "type": "npm",
+      "name": "npm:@svgdotjs/svg.filter.js",
+      "data": {
+        "version": "3.0.8",
+        "packageName": "@svgdotjs/svg.filter.js",
+        "hash": "sha512-YshF2YDaeRA2StyzAs5nUPrev7npQ38oWD0eTRwnsciSL2KrRPMoUw8BzjIXItb3+dccKGTX3IQOd2NFzmHkog=="
+      }
+    },
+    "npm:@svgdotjs/svg.js": {
+      "type": "npm",
+      "name": "npm:@svgdotjs/svg.js",
+      "data": {
+        "version": "3.2.4",
+        "packageName": "@svgdotjs/svg.js",
+        "hash": "sha512-BjJ/7vWNowlX3Z8O4ywT58DqbNRyYlkk6Yz/D13aB7hGmfQTvGX4Tkgtm/ApYlu9M7lCQi15xUEidqMUmdMYwg=="
+      }
+    },
+    "npm:@svgdotjs/svg.resize.js": {
+      "type": "npm",
+      "name": "npm:@svgdotjs/svg.resize.js",
+      "data": {
+        "version": "2.0.5",
+        "packageName": "@svgdotjs/svg.resize.js",
+        "hash": "sha512-4heRW4B1QrJeENfi7326lUPYBCevj78FJs8kfeDxn5st0IYPIRXoTtOSYvTzFWgaWWXd3YCDE6ao4fmv91RthA=="
+      }
+    },
+    "npm:@svgdotjs/svg.select.js": {
+      "type": "npm",
+      "name": "npm:@svgdotjs/svg.select.js",
+      "data": {
+        "version": "4.0.2",
+        "packageName": "@svgdotjs/svg.select.js",
+        "hash": "sha512-5gWdrvoQX3keo03SCmgaBbD+kFftq0F/f2bzCbNnpkkvW6tk4rl4MakORzFuNjvXPWwB4az9GwuvVxQVnjaK2g=="
+      }
+    },
     "npm:@tailwindcss/aspect-ratio": {
       "type": "npm",
       "name": "npm:@tailwindcss/aspect-ratio",
@@ -4924,6 +4978,15 @@
         "hash": "3661959027131258881"
       }
     },
+    "npm:@yr/monotone-cubic-spline": {
+      "type": "npm",
+      "name": "npm:@yr/monotone-cubic-spline",
+      "data": {
+        "version": "1.0.3",
+        "packageName": "@yr/monotone-cubic-spline",
+        "hash": "sha512-FQXkOta0XBSUPHndIKON2Y9JeQz5ZeMqLYZVVK93FliNBFm7LNMIZmY6FrMEB9XPcDbE2bekMbZD6kzDkxwYjA=="
+      }
+    },
     "npm:@zkochan/js-yaml": {
       "type": "npm",
       "name": "npm:@zkochan/js-yaml",
@@ -5129,6 +5192,15 @@
         "version": "4.0.2",
         "packageName": "picomatch",
         "hash": "9010519968461228871"
+      }
+    },
+    "npm:apexcharts": {
+      "type": "npm",
+      "name": "npm:apexcharts",
+      "data": {
+        "version": "4.5.0",
+        "packageName": "apexcharts",
+        "hash": "sha512-E7ZkrVqPNBUWy/Rmg8DEIqHNBmElzICE/oxOX5Ekvs2ICQUOK/VkEkMH09JGJu+O/EA0NL31hxlmF+wrwrSLaQ=="
       }
     },
     "npm:arg": {
@@ -9343,6 +9415,15 @@
         "hash": "3251360149369824974"
       }
     },
+    "npm:ng-apexcharts": {
+      "type": "npm",
+      "name": "npm:ng-apexcharts",
+      "data": {
+        "version": "1.15.0",
+        "packageName": "ng-apexcharts",
+        "hash": "sha512-CNJMStzS+NxLvxRLrybPCy67n1z53WqsGvD9qdepWMo3xgZRDzpX8NiNOvwWDsZGSi7Y/nS5qaUmiM84gi3x7Q=="
+      }
+    },
     "npm:ngx-sonner": {
       "type": "npm",
       "name": "npm:ngx-sonner",
@@ -10609,7 +10690,7 @@
       "data": {
         "version": "7.8.1",
         "packageName": "rxjs",
-        "hash": "4014524403016348722"
+        "hash": "sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg=="
       }
     },
     "npm:safe-regex-test": {
@@ -12117,12 +12198,22 @@
       },
       {
         "source": "pdc-hrm-admin",
+        "target": "npm:apexcharts",
+        "type": "static"
+      },
+      {
+        "source": "pdc-hrm-admin",
         "target": "npm:class-variance-authority",
         "type": "static"
       },
       {
         "source": "pdc-hrm-admin",
         "target": "npm:clsx",
+        "type": "static"
+      },
+      {
+        "source": "pdc-hrm-admin",
+        "target": "npm:ng-apexcharts",
         "type": "static"
       },
       {
@@ -18467,6 +18558,39 @@
         "type": "static"
       }
     ],
+    "npm:@svgdotjs/svg.draggable.js": [
+      {
+        "source": "npm:@svgdotjs/svg.draggable.js",
+        "target": "npm:@svgdotjs/svg.js",
+        "type": "static"
+      }
+    ],
+    "npm:@svgdotjs/svg.filter.js": [
+      {
+        "source": "npm:@svgdotjs/svg.filter.js",
+        "target": "npm:@svgdotjs/svg.js",
+        "type": "static"
+      }
+    ],
+    "npm:@svgdotjs/svg.resize.js": [
+      {
+        "source": "npm:@svgdotjs/svg.resize.js",
+        "target": "npm:@svgdotjs/svg.js",
+        "type": "static"
+      },
+      {
+        "source": "npm:@svgdotjs/svg.resize.js",
+        "target": "npm:@svgdotjs/svg.select.js",
+        "type": "static"
+      }
+    ],
+    "npm:@svgdotjs/svg.select.js": [
+      {
+        "source": "npm:@svgdotjs/svg.select.js",
+        "target": "npm:@svgdotjs/svg.js",
+        "type": "static"
+      }
+    ],
     "npm:@tailwindcss/aspect-ratio": [
       {
         "source": "npm:@tailwindcss/aspect-ratio",
@@ -19642,6 +19766,38 @@
       {
         "source": "npm:anymatch",
         "target": "npm:picomatch@2.3.1",
+        "type": "static"
+      }
+    ],
+    "npm:apexcharts": [
+      {
+        "source": "npm:apexcharts",
+        "target": "npm:@svgdotjs/svg.draggable.js",
+        "type": "static"
+      },
+      {
+        "source": "npm:apexcharts",
+        "target": "npm:@svgdotjs/svg.filter.js",
+        "type": "static"
+      },
+      {
+        "source": "npm:apexcharts",
+        "target": "npm:@svgdotjs/svg.js",
+        "type": "static"
+      },
+      {
+        "source": "npm:apexcharts",
+        "target": "npm:@svgdotjs/svg.resize.js",
+        "type": "static"
+      },
+      {
+        "source": "npm:apexcharts",
+        "target": "npm:@svgdotjs/svg.select.js",
+        "type": "static"
+      },
+      {
+        "source": "npm:apexcharts",
+        "target": "npm:@yr/monotone-cubic-spline",
         "type": "static"
       }
     ],
@@ -24109,6 +24265,33 @@
         "type": "static"
       }
     ],
+    "npm:ng-apexcharts": [
+      {
+        "source": "npm:ng-apexcharts",
+        "target": "npm:@angular/common",
+        "type": "static"
+      },
+      {
+        "source": "npm:ng-apexcharts",
+        "target": "npm:@angular/core",
+        "type": "static"
+      },
+      {
+        "source": "npm:ng-apexcharts",
+        "target": "npm:apexcharts",
+        "type": "static"
+      },
+      {
+        "source": "npm:ng-apexcharts",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "npm:ng-apexcharts",
+        "target": "npm:tslib",
+        "type": "static"
+      }
+    ],
     "npm:ngx-sonner": [
       {
         "source": "npm:ngx-sonner",
@@ -27934,5 +28117,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1739798884451
+  "computedAt": 1740099705726
 }

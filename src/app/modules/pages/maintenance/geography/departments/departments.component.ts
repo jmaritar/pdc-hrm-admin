@@ -8,9 +8,18 @@ import { TableCheckboxCellComponent } from '@app/shared/components/data-table/co
 import { TableCheckboxHeaderComponent } from '@app/shared/components/data-table/components/table-checkbox-header/table-checkbox-header.component';
 import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideLoader } from '@ng-icons/lucide';
+import { lucideEarth, lucideHouse, lucideLoader, lucideMap } from '@ng-icons/lucide';
 import { BrnDialogContentDirective } from '@spartan-ng/brain/dialog';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@spartan-ng/brain/forms';
+import {
+  HlmBreadcrumbDirective,
+  HlmBreadcrumbEllipsisComponent,
+  HlmBreadcrumbItemDirective,
+  HlmBreadcrumbLinkDirective,
+  HlmBreadcrumbListDirective,
+  HlmBreadcrumbPageDirective,
+  HlmBreadcrumbSeparatorComponent,
+} from '@spartan-ng/ui-breadcrumb-helm';
 import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
 import {
   HlmDialogComponent,
@@ -24,6 +33,7 @@ import { HlmInputDirective } from '@spartan-ng/ui-input-helm';
 import { ColumnDef } from '@tanstack/angular-table';
 import { toast } from 'ngx-sonner';
 
+import { BadgeMunicipalitiesComponent } from './components/badge-municipalities/badge-municipalities.component';
 import { DepartmentService } from './departments.service';
 
 @Component({
@@ -39,15 +49,21 @@ import { DepartmentService } from './departments.service';
     HlmDialogHeaderComponent,
     HlmDialogFooterComponent,
     HlmDialogTitleDirective,
-    // HlmDialogDescriptionDirective,
     HlmInputDirective,
     HlmFormFieldModule,
     HlmButtonDirective,
+    HlmBreadcrumbDirective,
+    HlmBreadcrumbEllipsisComponent,
+    HlmBreadcrumbItemDirective,
+    HlmBreadcrumbLinkDirective,
+    HlmBreadcrumbListDirective,
+    HlmBreadcrumbPageDirective,
+    HlmBreadcrumbSeparatorComponent,
     NgIcon,
   ],
   templateUrl: './departments.component.html',
   providers: [
-    provideIcons({ lucideLoader }),
+    provideIcons({ lucideLoader, lucideHouse, lucideEarth, lucideMap }),
     { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher },
   ],
 })
@@ -64,11 +80,12 @@ export class DepartmentsComponent implements OnInit {
   isModalOpen = false;
   isConfirmationOpen = false;
   isSubmitting = false;
+  countryId: string | null = null;
+  countryName: string | null = null;
 
   // ✅ Formulario de creación/edición de departamento
   form: FormGroup = this._formBuilder.group({
     name: ['', Validators.required],
-    code: ['', [Validators.required, Validators.maxLength(5)]],
   });
 
   // ✅ Configuración del DataTable
@@ -90,29 +107,6 @@ export class DepartmentsComponent implements OnInit {
       meta: { align: 'left' },
     },
     {
-      accessorKey: 'code',
-      header: () => DataTableColumnHeaderComponent,
-      size: 150,
-      meta: { align: 'center' },
-    },
-    {
-      accessorKey: 'created_at',
-      header: () => 'Departamentos',
-      cell: info => {
-        const department = info.row.original; // Obtener el departamento actual
-        return `
-          <button
-            class="px-3 py-1 text-xs font-medium bg-blue-500 text-white rounded-full hover:bg-blue-700 transition"
-            onclick="navigateToDepartment(${department.id_department}, '${department.name}')"
-          >
-            Ver departamentos
-          </button>
-        `;
-      },
-      size: 150,
-      meta: { align: 'center' },
-    },
-    {
       accessorKey: 'is_active',
       header: () => 'Estado',
       cell: info => `
@@ -127,6 +121,13 @@ export class DepartmentsComponent implements OnInit {
       meta: { align: 'center' },
     },
     {
+      accessorKey: 'count_municipalities',
+      header: () => 'Departamentos',
+      cell: () => BadgeMunicipalitiesComponent,
+      size: 150,
+      meta: { align: 'center' },
+    },
+    {
       id: 'actions',
       header: () => 'Acciones',
       enableSorting: false,
@@ -137,28 +138,52 @@ export class DepartmentsComponent implements OnInit {
   ];
 
   ngOnInit() {
-    const countryId = this.route.snapshot.paramMap.get('id_country');
-    console.log('ID del país:', countryId);
+    this.countryId = this.route.snapshot.paramMap.get('id_country');
+    this.route.queryParams.subscribe(params => {
+      this.countryName = params['name'] || 'Desconocido';
+    });
+
+    if (!this.countryId) {
+      toast.error('No se ha especificado un país válido.');
+      this.hasError = true;
+      this.isLoading = false;
+      return;
+    }
+
     this.loadDepartments();
   }
 
   /** 📌 Carga inicial de datos */
   loadDepartments() {
+    if (!this.countryId) return;
+
     this.isLoading = true;
     this.hasError = false;
     this.isDataLoaded = false;
 
-    this._departmentService.getDepartments().subscribe({
+    this._departmentService.getDepartmentByIdCountry(this.countryId).subscribe({
       next: (response: any) => {
-        this.data = response.data ?? [];
+        // Si la respuesta tiene un error 404, cargamos un array vacío
+        if (response?.statusCode === 404) {
+          this.data = [];
+        } else {
+          this.data = response.data ?? [];
+        }
         this.isLoading = false;
         this.isDataLoaded = true;
       },
       error: error => {
-        this.hasError = true;
-        this.isLoading = false;
-        this.isDataLoaded = false;
-        toast.error(error.message || 'Hubo un error al cargar los departamentos.');
+        // Verificamos si es error 404 para no marcarlo como error
+        if (error?.status === 404) {
+          this.data = [];
+          this.isLoading = false;
+          this.isDataLoaded = true;
+        } else {
+          this.hasError = true;
+          this.isLoading = false;
+          this.isDataLoaded = false;
+          toast.error(error.message || 'Hubo un error al cargar los departamentos.');
+        }
       },
     });
   }
@@ -197,7 +222,10 @@ export class DepartmentsComponent implements OnInit {
           this.selectedDepartment.id_department,
           this.form.value
         )
-      : this._departmentService.createDepartment(this.form.value);
+      : this._departmentService.createDepartment({
+          ...this.form.value,
+          country_id: this.countryId,
+        });
 
     request.subscribe({
       next: () => {

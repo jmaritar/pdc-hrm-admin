@@ -1,7 +1,44 @@
 <div class="p-6 border-muted/20 bg-background border rounded-xl shadow-md">
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl font-semibold text-primary">Gestión de Departamentos</h2>
-  </div>
+  <!-- 📌 Breadcrumb -->
+  <nav hlmBreadcrumb class="mb-4">
+    <ol hlmBreadcrumbList class="flex items-center gap-x-2">
+      <!-- Home -->
+      <li hlmBreadcrumbItem>
+        <a class="inline-flex items-center gap-1" hlmBreadcrumbLink link="/home">
+          <ng-icon hlm name="lucideHouse" />
+          <p>Home</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
+
+      <!-- Geografía -->
+      <li hlmBreadcrumbItem>
+        <a class="inline-flex items-center gap-1" hlmBreadcrumbLink>
+          <ng-icon hlm name="lucideMap" />
+          <p>Geografía</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
+
+      <!-- Países -->
+      <li hlmBreadcrumbItem>
+        <a
+          class="inline-flex items-center gap-1"
+          hlmBreadcrumbLink
+          link="/maintenance/geography/countries"
+        >
+          <ng-icon hlm name="lucideEarth" />
+          <p>Países</p>
+        </a>
+      </li>
+      <li hlmBreadcrumbSeparator></li>
+
+      <!-- Gestión de Departamentos -->
+      <li hlmBreadcrumbItem>
+        <span hlmBreadcrumbPage>Gestión de Departamentos - {{ countryName }}</span>
+      </li>
+    </ol>
+  </nav>
 
   @if (isLoading) {
     <div class="flex flex-col justify-center items-center p-10 text-muted-foreground gap-2">
@@ -54,19 +91,6 @@
             hlmInput
             class="mt-1 w-full"
             placeholder="Ej. Ciudad de Guatemala"
-          />
-        </label>
-      </hlm-form-field>
-
-      <hlm-form-field>
-        <label hlmLabel class="block text-sm font-medium text-gray-700">
-          Código del departamento
-          <input
-            formControlName="code"
-            hlmInput
-            class="mt-1 w-full"
-            placeholder="Ej. RRHH"
-            maxlength="5"
           />
         </label>
       </hlm-form-field>

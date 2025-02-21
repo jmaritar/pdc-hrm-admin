@@ -7,9 +7,18 @@ import { TableCheckboxCellComponent } from '@app/shared/components/data-table/co
 import { TableCheckboxHeaderComponent } from '@app/shared/components/data-table/components/table-checkbox-header/table-checkbox-header.component';
 import { DataTableComponent } from '@app/shared/components/data-table/data-table.component';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideLoader } from '@ng-icons/lucide';
+import { lucideEarth, lucideHouse, lucideLoader, lucideMap } from '@ng-icons/lucide';
 import { BrnDialogContentDirective } from '@spartan-ng/brain/dialog';
 import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@spartan-ng/brain/forms';
+import {
+  HlmBreadcrumbDirective,
+  HlmBreadcrumbEllipsisComponent,
+  HlmBreadcrumbItemDirective,
+  HlmBreadcrumbLinkDirective,
+  HlmBreadcrumbListDirective,
+  HlmBreadcrumbPageDirective,
+  HlmBreadcrumbSeparatorComponent,
+} from '@spartan-ng/ui-breadcrumb-helm';
 import { HlmButtonDirective } from '@spartan-ng/ui-button-helm';
 import {
   HlmDialogComponent,
@@ -46,11 +55,18 @@ import { CountryService } from './countries.service';
     HlmIconDirective,
     HlmFormFieldModule,
     HlmButtonDirective,
+    HlmBreadcrumbDirective,
+    HlmBreadcrumbEllipsisComponent,
+    HlmBreadcrumbItemDirective,
+    HlmBreadcrumbLinkDirective,
+    HlmBreadcrumbListDirective,
+    HlmBreadcrumbPageDirective,
+    HlmBreadcrumbSeparatorComponent,
   ],
   templateUrl: './countries.component.html',
 
   providers: [
-    provideIcons({ lucideLoader }),
+    provideIcons({ lucideLoader, lucideHouse, lucideEarth, lucideMap }),
     { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher },
   ],
 })
